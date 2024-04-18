@@ -7,7 +7,7 @@ pragma solidity ^0.5.0;
 contract Lock {
     // address owner; slot #0
     // address unlockTime; slot #1
-    constructor (address owner, uint256 unlockTime) public payable {
+    constructor(address owner, uint256 unlockTime) public payable {
         assembly {
             sstore(0x00, owner)
             sstore(0x01, unlockTime)
@@ -17,13 +17,18 @@ contract Lock {
     /**
      * @dev        Withdraw function once timestamp has passed unlock time
      */
-    function () external payable { // payable so solidity doesn't add unnecessary logic
+    function() external payable {
+        // payable so solidity doesn't add unnecessary logic
         assembly {
             switch gt(timestamp, sload(0x01))
-            case 0 { revert(0, 0) }
+            case 0 {
+                revert(0, 0)
+            }
             case 1 {
                 switch call(gas, sload(0x00), balance(address), 0, 0, 0, 0)
-                case 0 { revert(0, 0) }
+                case 0 {
+                    revert(0, 0)
+                }
             }
         }
     }
@@ -36,11 +41,19 @@ contract Lockdrop {
         TwelveMo
     }
     // Time constants
-    uint256 constant public LOCK_DROP_PERIOD = 1 days * 92; // 3 months
+    uint256 public constant LOCK_DROP_PERIOD = 1 days * 92; // 3 months
     uint256 public LOCK_START_TIME;
     uint256 public LOCK_END_TIME;
     // ETH locking events
-    event Locked(address indexed owner, uint256 eth, Lock lockAddr, Term term, bytes edgewareAddr, bool isValidator, uint time);
+    event Locked(
+        address indexed owner,
+        uint256 eth,
+        Lock lockAddr,
+        Term term,
+        bytes edgewareAddr,
+        bool isValidator,
+        uint time
+    );
     event Signaled(address indexed contractAddr, bytes edgewareAddr, uint time);
 
     constructor(uint startTime) public {
@@ -54,12 +67,11 @@ contract Lockdrop {
      * @param      edgewareAddr The bytes representation of the target edgeware key
      * @param      isValidator  Indicates if sender wishes to be a validator
      */
-    function lock(Term term, bytes calldata edgewareAddr, bool isValidator)
-        external
-        payable
-        didStart
-        didNotEnd
-    {
+    function lock(
+        Term term,
+        bytes calldata edgewareAddr,
+        bool isValidator
+    ) external payable didStart didNotEnd {
         uint256 eth = msg.value;
         address owner = msg.sender;
         uint256 unlockTime = unlockTimeForTerm(term);
@@ -76,12 +88,11 @@ contract Lockdrop {
      * @param      nonce         The transaction nonce of the creator of the contract
      * @param      edgewareAddr   The bytes representation of the target edgeware key
      */
-    function signal(address contractAddr, uint32 nonce, bytes calldata edgewareAddr)
-        external
-        didStart
-        didNotEnd
-        didCreate(contractAddr, msg.sender, nonce)
-    {
+    function signal(
+        address contractAddr,
+        uint32 nonce,
+        bytes calldata edgewareAddr
+    ) external didStart didNotEnd didCreate(contractAddr, msg.sender, nonce) {
         emit Signaled(contractAddr, edgewareAddr, now);
     }
 
@@ -115,12 +126,93 @@ contract Lockdrop {
      * @param      _nonce   The transaction nonce from which to generate a contract address
      */
     function addressFrom(address _origin, uint32 _nonce) public pure returns (address) {
-        if(_nonce == 0x00)     return address(uint160(uint256(keccak256(abi.encodePacked(byte(0xd6), byte(0x94), _origin, byte(0x80))))));
-        if(_nonce <= 0x7f)     return address(uint160(uint256(keccak256(abi.encodePacked(byte(0xd6), byte(0x94), _origin, uint8(_nonce))))));
-        if(_nonce <= 0xff)     return address(uint160(uint256(keccak256(abi.encodePacked(byte(0xd7), byte(0x94), _origin, byte(0x81), uint8(_nonce))))));
-        if(_nonce <= 0xffff)   return address(uint160(uint256(keccak256(abi.encodePacked(byte(0xd8), byte(0x94), _origin, byte(0x82), uint16(_nonce))))));
-        if(_nonce <= 0xffffff) return address(uint160(uint256(keccak256(abi.encodePacked(byte(0xd9), byte(0x94), _origin, byte(0x83), uint24(_nonce))))));
-        return address(uint160(uint256(keccak256(abi.encodePacked(byte(0xda), byte(0x94), _origin, byte(0x84), uint32(_nonce)))))); // more than 2^32 nonces not realistic
+        if (_nonce == 0x00)
+            return
+                address(
+                    uint160(
+                        uint256(
+                            keccak256(abi.encodePacked(byte(0xd6), byte(0x94), _origin, byte(0x80)))
+                        )
+                    )
+                );
+        if (_nonce <= 0x7f)
+            return
+                address(
+                    uint160(
+                        uint256(
+                            keccak256(
+                                abi.encodePacked(byte(0xd6), byte(0x94), _origin, uint8(_nonce))
+                            )
+                        )
+                    )
+                );
+        if (_nonce <= 0xff)
+            return
+                address(
+                    uint160(
+                        uint256(
+                            keccak256(
+                                abi.encodePacked(
+                                    byte(0xd7),
+                                    byte(0x94),
+                                    _origin,
+                                    byte(0x81),
+                                    uint8(_nonce)
+                                )
+                            )
+                        )
+                    )
+                );
+        if (_nonce <= 0xffff)
+            return
+                address(
+                    uint160(
+                        uint256(
+                            keccak256(
+                                abi.encodePacked(
+                                    byte(0xd8),
+                                    byte(0x94),
+                                    _origin,
+                                    byte(0x82),
+                                    uint16(_nonce)
+                                )
+                            )
+                        )
+                    )
+                );
+        if (_nonce <= 0xffffff)
+            return
+                address(
+                    uint160(
+                        uint256(
+                            keccak256(
+                                abi.encodePacked(
+                                    byte(0xd9),
+                                    byte(0x94),
+                                    _origin,
+                                    byte(0x83),
+                                    uint24(_nonce)
+                                )
+                            )
+                        )
+                    )
+                );
+        return
+            address(
+                uint160(
+                    uint256(
+                        keccak256(
+                            abi.encodePacked(
+                                byte(0xda),
+                                byte(0x94),
+                                _origin,
+                                byte(0x84),
+                                uint32(_nonce)
+                            )
+                        )
+                    )
+                )
+            ); // more than 2^32 nonces not realistic
     }
 
     /**
@@ -129,7 +221,11 @@ contract Lockdrop {
      * @param      parent  The creator of the alleged contract address
      * @param      nonce   The creator's tx nonce at the time of the contract creation
      */
-    modifier didCreate(address target, address parent, uint32 nonce) {
+    modifier didCreate(
+        address target,
+        address parent,
+        uint32 nonce
+    ) {
         // Trivially let senders "create" themselves
         if (target == parent) {
             _;

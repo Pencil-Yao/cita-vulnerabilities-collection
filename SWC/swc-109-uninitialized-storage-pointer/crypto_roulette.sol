@@ -11,7 +11,6 @@ pragma solidity ^0.4.19;
 // To play, call the play() method with the guessed number (1-20).  Bet price: 0.1 ether
 
 contract CryptoRoulette {
-
     uint256 private secretNumber;
     uint256 public lastPlayed;
     uint256 public betPrice = 0.1 ether;
@@ -30,13 +29,13 @@ contract CryptoRoulette {
 
     function shuffle() internal {
         // randomly set secretNumber with a value between 1 and 20
-        secretNumber = uint8(sha3(now, block.blockhash(block.number-1))) % 20 + 1;
+        secretNumber = (uint8(sha3(now, block.blockhash(block.number - 1))) % 20) + 1;
     }
 
-    function play(uint256 number) payable public {
+    function play(uint256 number) public payable {
         require(msg.value >= betPrice && number <= 10);
 
-        Game game;  //! uninitialized storage pointer
+        Game game; //! uninitialized storage pointer
         game.player = msg.sender;
         game.number = number;
         gamesPlayed.push(game);
@@ -56,5 +55,5 @@ contract CryptoRoulette {
         }
     }
 
-    function() public payable { }
+    function() public payable {}
 }

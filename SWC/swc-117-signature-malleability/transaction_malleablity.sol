@@ -1,35 +1,35 @@
 pragma solidity ^0.4.24;
 
-contract transaction_malleablity{
-  mapping(address => uint256) balances;
-  mapping(bytes32 => bool) signatureUsed;
+contract transaction_malleablity {
+    mapping(address => uint256) balances;
+    mapping(bytes32 => bool) signatureUsed;
 
-  constructor(address[] owners, uint[] init){
-    require(owners.length == init.length);
-    for(uint i=0; i < owners.length; i ++){
-      balances[owners[i]] = init[i];
+    constructor(address[] owners, uint[] init) {
+        require(owners.length == init.length);
+        for (uint i = 0; i < owners.length; i++) {
+            balances[owners[i]] = init[i];
+        }
     }
-  }
 
-  function transfer(
+    function transfer(
         bytes _signature,
         address _to,
         uint256 _value,
         uint256 _gasPrice,
-        uint256 _nonce)
-      public
-    returns (bool)
-    {
-      bytes32 txid = keccak256(abi.encodePacked(getTransferHash(_to, _value, _gasPrice, _nonce), _signature)); //! correct: bytes32 txid = getTransferHash(_to, _value, _gasPrice, _nonce)
-      require(!signatureUsed[txid]);
+        uint256 _nonce
+    ) public returns (bool) {
+        bytes32 txid = keccak256(
+            abi.encodePacked(getTransferHash(_to, _value, _gasPrice, _nonce), _signature)
+        ); //! correct: bytes32 txid = getTransferHash(_to, _value, _gasPrice, _nonce)
+        require(!signatureUsed[txid]);
 
-      address from = recoverTransferPreSigned(_signature, _to, _value, _gasPrice, _nonce);
+        address from = recoverTransferPreSigned(_signature, _to, _value, _gasPrice, _nonce);
 
-      require(balances[from] > _value);
-      balances[from] -= _value;
-      balances[_to] += _value;
+        require(balances[from] > _value);
+        balances[from] -= _value;
+        balances[_to] += _value;
 
-      signatureUsed[txid] = true;
+        signatureUsed[txid] = true;
     }
 
     function recoverTransferPreSigned(
@@ -37,11 +37,8 @@ contract transaction_malleablity{
         address _to,
         uint256 _value,
         uint256 _gasPrice,
-        uint256 _nonce)
-      public
-      view
-    returns (address recovered)
-    {
+        uint256 _nonce
+    ) public view returns (address recovered) {
         return ecrecoverFromSig(getSignHash(getTransferHash(_to, _value, _gasPrice, _nonce)), _sig);
     }
 
@@ -49,26 +46,19 @@ contract transaction_malleablity{
         address _to,
         uint256 _value,
         uint256 _gasPrice,
-        uint256 _nonce)
-      public
-      view
-    returns (bytes32 txHash) {
+        uint256 _nonce
+    ) public view returns (bytes32 txHash) {
         return keccak256(address(this), bytes4(0x1296830d), _to, _value, _gasPrice, _nonce);
     }
 
-    function getSignHash(bytes32 _hash)
-      public
-      pure
-    returns (bytes32 signHash)
-    {
+    function getSignHash(bytes32 _hash) public pure returns (bytes32 signHash) {
         return keccak256("\x19Ethereum Signed Message:\n32", _hash);
     }
 
-    function ecrecoverFromSig(bytes32 hash, bytes sig)
-      public
-      pure
-    returns (address recoveredAddress)
-    {
+    function ecrecoverFromSig(
+        bytes32 hash,
+        bytes sig
+    ) public pure returns (address recoveredAddress) {
         bytes32 r;
         bytes32 s;
         uint8 v;
@@ -79,7 +69,7 @@ contract transaction_malleablity{
             v := byte(0, mload(add(sig, 96)))
         }
         if (v < 27) {
-          v += 27;
+            v += 27;
         }
         if (v != 27 && v != 28) return address(0);
         return ecrecover(hash, v, r, s);

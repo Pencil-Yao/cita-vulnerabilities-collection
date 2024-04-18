@@ -4,49 +4,48 @@
  */
 pragma solidity ^0.5.0;
 
-contract GuessTheNumber
-{
+contract GuessTheNumber {
     uint _secretNumber;
     address payable _owner;
     event success(string);
     event wrongNumber(string);
 
-    constructor(uint secretNumber) payable public
-    {
+    constructor(uint secretNumber) public payable {
         require(secretNumber <= 10);
         _secretNumber = secretNumber;
         _owner = msg.sender;
     }
 
-    function getValue() view public returns (uint)
-    {
+    function getValue() public view returns (uint) {
         return address(this).balance;
     }
 
-    function guess(uint n) payable public
-    {
+    function guess(uint n) public payable {
         require(msg.value == 1 ether);
 
         uint p = address(this).balance;
-        checkAndTransferPrize(/*The prize‮/*rebmun desseug*/n , p/*‭
-		        /*The user who should benefit */,msg.sender); //! Right-To-Left-Override control character (U+202E)
+        checkAndTransferPrize(
+            /*The prize‮/*rebmun desseug*/ n,
+            p /*‭
+		        /*The user who should benefit */,
+            msg.sender
+        ); //! Right-To-Left-Override control character (U+202E)
     }
 
-    function checkAndTransferPrize(uint p, uint n, address payable guesser) internal returns(bool)
-    {
-        if(n == _secretNumber)
-        {
+    function checkAndTransferPrize(
+        uint p,
+        uint n,
+        address payable guesser
+    ) internal returns (bool) {
+        if (n == _secretNumber) {
             guesser.transfer(p);
             emit success("You guessed the correct number!");
-        }
-        else
-        {
+        } else {
             emit wrongNumber("You've made an incorrect guess!");
         }
     }
 
-    function kill() public
-    {
+    function kill() public {
         require(msg.sender == _owner);
         selfdestruct(_owner);
     }

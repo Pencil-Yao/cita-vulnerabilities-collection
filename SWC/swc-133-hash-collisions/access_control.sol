@@ -15,9 +15,7 @@ contract AccessControl {
         address[] calldata admins,
         address[] calldata regularUsers,
         bytes calldata signature
-    )
-        external
-    {
+    ) external {
         if (!isAdmin[msg.sender]) {
             // Allow calls to be relayed with an admin's signature.
             bytes32 hash = keccak256(abi.encodePacked(admins, regularUsers)); //! admins & regularUsers are arrays

@@ -14,7 +14,7 @@ contract Wallet {
     }
 
     function deposit() public payable {
-    	assert(balances[msg.sender] + msg.value > balances[msg.sender]);
+        assert(balances[msg.sender] + msg.value > balances[msg.sender]);
         balances[msg.sender] += msg.value;
     }
 
@@ -35,5 +35,4 @@ contract Wallet {
         require(creator == msg.sender);
         to.transfer(this.balance);
     }
-
 }

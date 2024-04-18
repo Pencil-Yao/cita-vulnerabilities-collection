@@ -14,11 +14,11 @@ contract Relayer {
         bool executed;
     }
 
-    mapping (uint => Tx) transactions;
+    mapping(uint => Tx) transactions;
 
     function relay(Target target, bytes memory _data, uint _gasLimit) public {
         // replay protection; do not call the same transaction twice
-        require(transactions[transactionId].executed == false, 'same transaction twice');
+        require(transactions[transactionId].executed == false, "same transaction twice");
         transactions[transactionId].data = _data;
         transactions[transactionId].executed = true;
         transactionId += 1;
@@ -30,7 +30,7 @@ contract Relayer {
 // Contract called by Relayer
 contract Target {
     function execute(bytes memory _data, uint _gasLimit) public {
-        require(gasleft() >= _gasLimit, 'not enough gas');
+        require(gasleft() >= _gasLimit, "not enough gas");
         // Execute contract code
     }
 }

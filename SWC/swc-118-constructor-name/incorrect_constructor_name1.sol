@@ -4,29 +4,24 @@
  * Modified by Gerhard Wagner
  */
 
-
 pragma solidity 0.4.24;
 
-contract Missing{
+contract Missing {
     address private owner;
 
-    modifier onlyowner {
-        require(msg.sender==owner);
+    modifier onlyowner() {
+        require(msg.sender == owner);
         _;
     }
 
-    function missing() //! incorrect construct name
-        public
+    function missing() public //! incorrect construct name
     {
         owner = msg.sender;
     }
 
-    function () payable {}
+    function() payable {}
 
-    function withdraw()
-        public
-        onlyowner
-    {
-       owner.transfer(this.balance);
+    function withdraw() public onlyowner {
+        owner.transfer(this.balance);
     }
 }

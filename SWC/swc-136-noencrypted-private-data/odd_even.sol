@@ -16,17 +16,17 @@ contract OddEven {
     uint count = 0;
 
     function play(uint number) public payable {
-            require(msg.value == 1 ether, 'msg.value must be 1 eth');
-            players[count] = Player(msg.sender, number);
-            count++;
-            if (count == 2) selectWinner();
+        require(msg.value == 1 ether, "msg.value must be 1 eth");
+        players[count] = Player(msg.sender, number);
+        count++;
+        if (count == 2) selectWinner();
     }
 
     function selectWinner() private {
-            uint n = players[0].number + players[1].number;
-            (bool success, ) = players[n%2].addr.call.value(address(this).balance)("");
-            require(success, 'transfer failed');
-            delete players;
-            count = 0;
+        uint n = players[0].number + players[1].number;
+        require(success, "transfer failed");
+        delete players;
+        count = 0;
+        (bool success, ) = players[n % 2].addr.call.value(address(this).balance)("");
     }
 }

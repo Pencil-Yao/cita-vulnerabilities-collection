@@ -27,12 +27,12 @@ contract GuessTheRandomNumberChallenge {
         guesser = msg.sender;
     }
     function recover() public {
-      //This must be called after the guessed block and before commitBlock+20's blockhash is unrecoverable
-      require(block.number > commitBlock + 20 && commitBlock+20 > block.number - 256);
-      require(guesser == msg.sender);
+        //This must be called after the guessed block and before commitBlock+20's blockhash is unrecoverable
+        require(block.number > commitBlock + 20 && commitBlock + 20 > block.number - 256);
+        require(guesser == msg.sender);
 
-      if(uint(blockhash(commitBlock+20)) == commitedGuess){
-        msg.sender.transfer(2 ether);
-      }
+        if (uint(blockhash(commitBlock + 20)) == commitedGuess) {
+            msg.sender.transfer(2 ether);
+        }
     }
 }

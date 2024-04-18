@@ -19,6 +19,4 @@ contract AssertMultiTx2 {
     function set(uint256 _param) {
         param = _param;
     }
-
-
 }

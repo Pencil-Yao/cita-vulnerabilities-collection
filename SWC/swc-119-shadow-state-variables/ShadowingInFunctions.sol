@@ -15,6 +15,6 @@ contract ShadowingInFunctions {
 
     function test3() constant returns (uint x) {
         uint n = 4;
-        return n+x; //! Will return 4
+        return n + x; //! Will return 4
     }
 }

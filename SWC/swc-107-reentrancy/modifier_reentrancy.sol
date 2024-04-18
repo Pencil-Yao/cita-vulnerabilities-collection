@@ -1,17 +1,17 @@
 pragma solidity ^0.5.0;
 
 contract ModifierEntrancy {
-
-    mapping (address => uint) public tokenBalance;
+    mapping(address => uint) public tokenBalance;
     string constant name = "Nu Token";
     Bank bank;
 
-    constructor() public{
+    constructor() public {
         bank = new Bank();
     }
 
     //If a contract has a zero balance and supports the token give them some token
-    function airDrop() hasNoBalance supportsToken  public{ //! reentry, modify: supportsToken before hasNoBalance
+    function airDrop() public hasNoBalance supportsToken {
+        //! reentry, modify: supportsToken before hasNoBalance
         tokenBalance[msg.sender] += 20;
     }
 
@@ -22,16 +22,14 @@ contract ModifierEntrancy {
     }
 
     //Checks that the caller has a zero balance
-    modifier hasNoBalance {
+    modifier hasNoBalance() {
         require(tokenBalance[msg.sender] == 0);
         _;
     }
 }
 
-contract Bank{
-
-    function supportsToken() external returns(bytes32) {
+contract Bank {
+    function supportsToken() external returns (bytes32) {
         return keccak256(abi.encodePacked("Nu Token"));
     }
-
 }

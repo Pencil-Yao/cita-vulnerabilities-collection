@@ -5,18 +5,16 @@
 
 pragma solidity ^0.4.25;
 
-contract ConstructorCreate{
+contract ConstructorCreate {
     B b = new B();
 
-    function check(){
+    function check() {
         assert(b.foo() == 10);
     }
-
 }
 
-contract B{
-
-    function foo() returns(uint){
+contract B {
+    function foo() returns (uint) {
         return 11;
     }
 }

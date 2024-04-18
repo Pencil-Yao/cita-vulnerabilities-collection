@@ -5,16 +5,16 @@ contract UnusedVariables {
 
     //! y is not used
     function unusedArg(int x, int y) public view returns (int z) {
-        z = x + a;  
+        z = x + a;
     }
 
     // n is not reported it is part of another SWC category
     function unusedReturn(int x, int y) public pure returns (int m, int n, int o) {
         m = y - x;
-        o = m/2;
+        o = m / 2;
     }
 
-    // x is not accessed 
+    // x is not accessed
     function neverAccessed(int test) public pure returns (int) {
         int z = 10;
 
@@ -27,11 +27,8 @@ contract UnusedVariables {
 
         return z;
     }
-    
-    function tupleAssignment(int p) public returns (int q, int r){
-        (q, , r) = unusedReturn(p,2);
-        
+
+    function tupleAssignment(int p) public returns (int q, int r) {
+        (q, , r) = unusedReturn(p, 2);
     }
-
-
 }

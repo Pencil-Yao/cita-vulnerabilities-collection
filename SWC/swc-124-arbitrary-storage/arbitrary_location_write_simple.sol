@@ -9,8 +9,7 @@ contract Wallet {
         owner = msg.sender;
     }
 
-    function () public payable {
-    }
+    function() public payable {}
 
     function PushBonusCode(uint c) public {
         bonusCodes.push(c);

@@ -16,5 +16,4 @@ contract AssertMultiTx1 {
     function run() {
         assert(param > 0);
     }
-
 }

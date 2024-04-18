@@ -1,11 +1,9 @@
 pragma solidity ^0.4.24;
 
 contract DeprecatedSimple {
-
     // Do everything that's deprecated, then commit suicide.
 
     function useDeprecated() public constant {
-
         bytes32 blockhash = block.blockhash(0);
         bytes32 hashofhash = sha3(blockhash);
 
@@ -17,13 +15,12 @@ contract DeprecatedSimple {
 
         address(this).callcode();
 
-        var a = [1,2,3];
+        var a = [1, 2, 3];
 
         var (x, y, z) = (false, "test", 0);
 
         suicide(address(0));
     }
 
-    function () public {}
-
+    function() public {}
 }

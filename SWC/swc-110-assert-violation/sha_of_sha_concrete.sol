@@ -4,17 +4,15 @@
  */
 pragma solidity ^0.4.22;
 
-contract ShaOfShaConcrete{
-
-    mapping(bytes32=>uint) m;
+contract ShaOfShaConcrete {
+    mapping(bytes32 => uint) m;
     uint b;
 
-    constructor(){
+    constructor() {
         b = 1;
     }
 
-    function check(uint x){
+    function check(uint x) {
         assert(m[keccak256(abi.encodePacked(x, "B"))] == 0);
     }
-
 }

@@ -1,7 +1,6 @@
 pragma solidity ^0.4.22;
 
 contract Rubixi {
-
     //Declare variables for storage critical to contract
     uint private balance = 0;
     uint private collectedFees = 0;
@@ -16,7 +15,8 @@ contract Rubixi {
         creator = msg.sender; //! creator set no protection
     }
 
-    modifier onlyowner { //! due to DynamicPyramid, onlyowner can't protect import method
+    modifier onlyowner() {
+        //! due to DynamicPyramid, onlyowner can't protect import method
         if (msg.sender == creator) _;
     }
 
@@ -91,7 +91,7 @@ contract Rubixi {
     function collectPercentOfFees(uint _pcent) onlyowner {
         if (collectedFees == 0 || _pcent > 100) throw;
 
-        uint feesToCollect = collectedFees / 100 * _pcent;
+        uint feesToCollect = (collectedFees / 100) * _pcent;
         creator.send(feesToCollect);
         collectedFees -= feesToCollect;
     }
@@ -114,38 +114,46 @@ contract Rubixi {
     }
 
     //Functions to provide information to end-user using JSON interface or other interfaces
-    function currentMultiplier() constant returns(uint multiplier, string info) {
+    function currentMultiplier() constant returns (uint multiplier, string info) {
         multiplier = pyramidMultiplier;
-        info = 'This multiplier applies to you as soon as transaction is received, may be lowered to hasten payouts or increased if payouts are fast enough. Due to no float or decimals, multiplier is x100 for a fractional multiplier e.g. 250 is actually a 2.5x multiplier. Capped at 3x max and 1.2x min.';
+        info = "This multiplier applies to you as soon as transaction is received, may be lowered to hasten payouts or increased if payouts are fast enough. Due to no float or decimals, multiplier is x100 for a fractional multiplier e.g. 250 is actually a 2.5x multiplier. Capped at 3x max and 1.2x min.";
     }
 
-    function currentFeePercentage() constant returns(uint fee, string info) {
+    function currentFeePercentage() constant returns (uint fee, string info) {
         fee = feePercent;
-        info = 'Shown in % form. Fee is halved(50%) for amounts equal or greater than 50 ethers. (Fee may change, but is capped to a maximum of 10%)';
+        info = "Shown in % form. Fee is halved(50%) for amounts equal or greater than 50 ethers. (Fee may change, but is capped to a maximum of 10%)";
     }
 
-    function currentPyramidBalanceApproximately() constant returns(uint pyramidBalance, string info) {
+    function currentPyramidBalanceApproximately()
+        constant
+        returns (uint pyramidBalance, string info)
+    {
         pyramidBalance = balance / 1 ether;
-        info = 'All balance values are measured in Ethers, note that due to no decimal placing, these values show up as integers only, within the contract itself you will get the exact decimal value you are supposed to';
+        info = "All balance values are measured in Ethers, note that due to no decimal placing, these values show up as integers only, within the contract itself you will get the exact decimal value you are supposed to";
     }
 
-    function nextPayoutWhenPyramidBalanceTotalsApproximately() constant returns(uint balancePayout) {
+    function nextPayoutWhenPyramidBalanceTotalsApproximately()
+        constant
+        returns (uint balancePayout)
+    {
         balancePayout = participants[payoutOrder].payout / 1 ether;
     }
 
-    function feesSeperateFromBalanceApproximately() constant returns(uint fees) {
+    function feesSeperateFromBalanceApproximately() constant returns (uint fees) {
         fees = collectedFees / 1 ether;
     }
 
-    function totalParticipants() constant returns(uint count) {
+    function totalParticipants() constant returns (uint count) {
         count = participants.length;
     }
 
-    function numberOfParticipantsWaitingForPayout() constant returns(uint count) {
+    function numberOfParticipantsWaitingForPayout() constant returns (uint count) {
         count = participants.length - payoutOrder;
     }
 
-    function participantDetails(uint orderInPyramid) constant returns(address Address, uint Payout) {
+    function participantDetails(
+        uint orderInPyramid
+    ) constant returns (address Address, uint Payout) {
         if (orderInPyramid <= participants.length) {
             Address = participants[orderInPyramid].etherAddress;
             Payout = participants[orderInPyramid].payout / 1 ether;

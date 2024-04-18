@@ -1,11 +1,10 @@
 pragma solidity ^0.4.24;
 
 contract Proxy {
-
     address callee;
     address owner;
 
-    modifier onlyOwner {
+    modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
@@ -22,5 +21,4 @@ contract Proxy {
     function forward(bytes _data) public {
         require(callee.delegatecall(_data));
     }
-
 }

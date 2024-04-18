@@ -15,15 +15,16 @@ contract EthTxOrderDependenceMinimal {
     }
 
     function setReward() public payable {
-        require (!claimed);
+        require(!claimed);
 
         require(msg.sender == owner);
         owner.transfer(reward);
         reward = msg.value;
     }
 
-    function claimReward(uint256 submission) { //! submission should add salt
-        require (!claimed);
+    function claimReward(uint256 submission) {
+        //! submission should add salt
+        require(!claimed);
         require(submission < 10);
 
         msg.sender.transfer(reward);

@@ -17,8 +17,8 @@ contract Map {
     function get(uint256 key) public view returns (uint256) {
         return map[key];
     }
-    function withdraw() public{
-      require(msg.sender == owner);
-      msg.sender.transfer(address(this).balance);
+    function withdraw() public {
+        require(msg.sender == owner);
+        msg.sender.transfer(address(this).balance);
     }
 }

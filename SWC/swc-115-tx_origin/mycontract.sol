@@ -1,13 +1,12 @@
 /*
  * @source: https://consensys.github.io/smart-contract-best-practices/recommendations/#avoid-using-txorigin
- * @author: Consensys Diligence  
+ * @author: Consensys Diligence
  * Modified by Gerhard Wagner
  */
 
 pragma solidity 0.4.24;
 
 contract MyContract {
-
     address owner;
 
     function MyContract() public {
@@ -18,5 +17,4 @@ contract MyContract {
         require(tx.origin == owner); //! not use tx.origin
         receiver.transfer(amount);
     }
-
 }

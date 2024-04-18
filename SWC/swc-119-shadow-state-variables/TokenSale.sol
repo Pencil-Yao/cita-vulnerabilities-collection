@@ -5,7 +5,7 @@ contract Tokensale {
 
     function Tokensale() {}
 
-    function fetchCap() public constant returns(uint) {
+    function fetchCap() public constant returns (uint) {
         return hardcap;
     }
 }

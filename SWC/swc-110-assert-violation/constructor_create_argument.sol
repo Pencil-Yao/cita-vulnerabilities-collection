@@ -4,23 +4,21 @@
  */
 pragma solidity ^0.4.22;
 
-contract ConstructorCreateArgument{
+contract ConstructorCreateArgument {
     B b = new B(11);
 
-    function check(){
+    function check() {
         assert(b.foo() == 10);
     }
-
 }
 
-contract B{
-
+contract B {
     uint x_;
-    constructor(uint x){
+    constructor(uint x) {
         x_ = x;
     }
 
-    function foo() returns(uint){
+    function foo() returns (uint) {
         return x_;
     }
 }

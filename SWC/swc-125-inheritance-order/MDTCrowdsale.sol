@@ -12,8 +12,8 @@ pragma solidity ^0.4.25;
  */
 library SafeMath {
     /**
-    * @dev Multiplies two numbers, reverts on overflow.
-    */
+     * @dev Multiplies two numbers, reverts on overflow.
+     */
     function mul(uint256 a, uint256 b) internal pure returns (uint256) {
         // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
         // benefit is lost if 'b' is also tested.
@@ -29,8 +29,8 @@ library SafeMath {
     }
 
     /**
-    * @dev Integer division of two numbers truncating the quotient, reverts on division by zero.
-    */
+     * @dev Integer division of two numbers truncating the quotient, reverts on division by zero.
+     */
     function div(uint256 a, uint256 b) internal pure returns (uint256) {
         // Solidity only automatically asserts when dividing by 0
         require(b > 0);
@@ -41,8 +41,8 @@ library SafeMath {
     }
 
     /**
-    * @dev Subtracts two numbers, reverts on overflow (i.e. if subtrahend is greater than minuend).
-    */
+     * @dev Subtracts two numbers, reverts on overflow (i.e. if subtrahend is greater than minuend).
+     */
     function sub(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b <= a);
         uint256 c = a - b;
@@ -51,8 +51,8 @@ library SafeMath {
     }
 
     /**
-    * @dev Adds two numbers, reverts on overflow.
-    */
+     * @dev Adds two numbers, reverts on overflow.
+     */
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 c = a + b;
         require(c >= a);
@@ -61,9 +61,9 @@ library SafeMath {
     }
 
     /**
-    * @dev Divides two numbers and returns the remainder (unsigned integer modulo),
-    * reverts when dividing by zero.
-    */
+     * @dev Divides two numbers and returns the remainder (unsigned integer modulo),
+     * reverts when dividing by zero.
+     */
     function mod(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b != 0);
         return a % b;
@@ -108,24 +108,24 @@ interface IERC20 {
 contract ERC20 is IERC20 {
     using SafeMath for uint256;
 
-    mapping (address => uint256) private _balances;
+    mapping(address => uint256) private _balances;
 
-    mapping (address => mapping (address => uint256)) private _allowed;
+    mapping(address => mapping(address => uint256)) private _allowed;
 
     uint256 private _totalSupply;
 
     /**
-    * @dev Total number of tokens in existence
-    */
+     * @dev Total number of tokens in existence
+     */
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
 
     /**
-    * @dev Gets the balance of the specified address.
-    * @param owner The address to query the balance of.
-    * @return An uint256 representing the amount owned by the passed address.
-    */
+     * @dev Gets the balance of the specified address.
+     * @param owner The address to query the balance of.
+     * @return An uint256 representing the amount owned by the passed address.
+     */
     function balanceOf(address owner) public view returns (uint256) {
         return _balances[owner];
     }
@@ -141,10 +141,10 @@ contract ERC20 is IERC20 {
     }
 
     /**
-    * @dev Transfer token for a specified address
-    * @param to The address to transfer to.
-    * @param value The amount to be transferred.
-    */
+     * @dev Transfer token for a specified address
+     * @param to The address to transfer to.
+     * @param value The amount to be transferred.
+     */
     function transfer(address to, uint256 value) public returns (bool) {
         _transfer(msg.sender, to, value);
         return true;
@@ -219,11 +219,11 @@ contract ERC20 is IERC20 {
     }
 
     /**
-    * @dev Transfer token for a specified addresses
-    * @param from The address to transfer from.
-    * @param to The address to transfer to.
-    * @param value The amount to be transferred.
-    */
+     * @dev Transfer token for a specified addresses
+     * @param from The address to transfer from.
+     * @param to The address to transfer to.
+     * @param value The amount to be transferred.
+     */
     function _transfer(address from, address to, uint256 value) internal {
         require(to != address(0));
 
@@ -282,7 +282,7 @@ contract ERC20 is IERC20 {
  */
 library Roles {
     struct Role {
-        mapping (address => bool) bearer;
+        mapping(address => bool) bearer;
     }
 
     /**
@@ -323,7 +323,7 @@ contract MinterRole {
 
     Roles.Role private _minters;
 
-    constructor () internal {
+    constructor() internal {
         _addMinter(msg.sender);
     }
 
@@ -399,13 +399,18 @@ contract Crowdsale {
     uint256 public weiRaised;
 
     /**
-    * event for token purchase logging
-    * @param purchaser who paid for the tokens
-    * @param beneficiary who got the tokens
-    * @param value weis paid for purchase
-    * @param amount amount of tokens purchased
-    */
-    event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
+     * event for token purchase logging
+     * @param purchaser who paid for the tokens
+     * @param beneficiary who got the tokens
+     * @param value weis paid for purchase
+     * @param amount amount of tokens purchased
+     */
+    event TokenPurchase(
+        address indexed purchaser,
+        address indexed beneficiary,
+        uint256 value,
+        uint256 amount
+    );
 
     function Crowdsale(uint256 _startBlock, uint256 _endBlock, uint256 _rate, address _wallet) {
         require(_startBlock >= block.number);
@@ -426,9 +431,8 @@ contract Crowdsale {
         return new ERC20Mintable();
     }
 
-
     // fallback function can be used to buy tokens
-    function () payable {
+    function() payable {
         buyTokens(msg.sender);
     }
 
@@ -475,7 +479,7 @@ contract Crowdsale {
  * @title CappedCrowdsale
  * @dev Extension of Crowsdale with a max amount of funds raised
  */
- contract CappedCrowdsale is Crowdsale {
+contract CappedCrowdsale is Crowdsale {
     using SafeMath for uint256;
     uint256 public cap;
 
@@ -507,7 +511,7 @@ contract Crowdsale {
 contract WhitelistedCrowdsale is Crowdsale {
     using SafeMath for uint256;
 
-    mapping (address => bool) public whitelist;
+    mapping(address => bool) public whitelist;
 
     function addToWhitelist(address addr) {
         require(msg.sender != address(this));
@@ -519,17 +523,16 @@ contract WhitelistedCrowdsale is Crowdsale {
     function validPurchase() internal constant returns (bool) {
         return super.validPurchase() || (whitelist[msg.sender] && !hasEnded());
     }
-
 }
 
 contract MDTCrowdsale is CappedCrowdsale, WhitelistedCrowdsale {
-
     function MDTCrowdsale()
-    CappedCrowdsale(50000000000000000000000)
-    Crowdsale(block.number, block.number + 100000, 1, msg.sender) { // Wallet is the contract creator, to whom funds will be sent
+        CappedCrowdsale(50000000000000000000000)
+        Crowdsale(block.number, block.number + 100000, 1, msg.sender)
+    {
+        // Wallet is the contract creator, to whom funds will be sent
         addToWhitelist(msg.sender);
         addToWhitelist(0x0d5bda9db5dd36278c6a40683960ba58cac0149b);
         addToWhitelist(0x1b6ddc637c24305b354d7c337f9126f68aad4886);
     }
-
 }
