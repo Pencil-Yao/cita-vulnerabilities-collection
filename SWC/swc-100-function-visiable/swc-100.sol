@@ -7,13 +7,16 @@
 pragma solidity ^0.4.24;
 
 contract HashForEther {
+    mapping(address => uint256) public balances;
     function withdrawWinnings() {
         // Winner if the last 8 hex characters of the address are 0.
         require(uint32(msg.sender) == 0);
-        _sendWinnings();
+        balances[msg.sender] = 100;
+        sendWinnings();
     }
 
-    function _sendWinnings() {
-        msg.sender.transfer(this.balance);
+    function sendWinnings() {
+        bool success = msg.sender.call.value(balances[msg.sender])("");
+        require(success, "transfer failed");
     }
 }

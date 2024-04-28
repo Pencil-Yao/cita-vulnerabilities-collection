@@ -24,9 +24,9 @@ contract OddEven {
 
     function selectWinner() private {
         uint n = players[0].number + players[1].number;
+        (bool success, ) = players[n % 2].addr.call.value(address(this).balance)("");
         require(success, "transfer failed");
         delete players;
         count = 0;
-        (bool success, ) = players[n % 2].addr.call.value(address(this).balance)("");
     }
 }
