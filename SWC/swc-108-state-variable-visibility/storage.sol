@@ -1,12 +1,12 @@
 pragma solidity 0.4.24;
 
 contract TestStorage {
-    uint storeduint1 = 15; //! state variable default visible
-    uint constant constuint = 16;
-    uint32 investmentsDeadlineTimeStamp = uint32(now);
+    //    uint storeduint1 = 15; //! state variable default visible
+    //    uint constant constuint = 16;
+    //    uint32 investmentsDeadlineTimeStamp = uint32(now);
 
-    bytes16 string1 = "test1";
-    bytes32 private string2 = "test1236";
+    //    bytes16 string1 = "test1";
+    //    bytes32 private string2 = "test1236";
     string public string3 = "lets string something";
 
     mapping(address => uint) public uints1;

@@ -1,8 +1,8 @@
 pragma solidity ^0.4.25;
 
 contract TypoSimple {
-    uint onlyOne = 1;
-    bool win = false;
+    uint public onlyOne = 1;
+    bool public win = false;
 
     function addOne() public {
         onlyOne = +1; //! typo

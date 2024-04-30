@@ -12,7 +12,7 @@ contract RuntimeCreateUserInput {
 }
 
 contract B {
-    uint x_;
+    uint public x_;
     constructor(uint x) {
         x_ = x;
     }

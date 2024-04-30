@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 contract UnusedVariables {
-    int a = 1;
+    int public a = 1;
 
     //! y is not used
     function unusedArg(int x, int y) public view returns (int z) {

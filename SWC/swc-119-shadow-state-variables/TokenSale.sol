@@ -1,7 +1,7 @@
 pragma solidity 0.4.24;
 
 contract Tokensale {
-    uint hardcap = 10000 ether;
+    uint public hardcap = 10000 ether;
 
     function Tokensale() {}
 
@@ -11,7 +11,7 @@ contract Tokensale {
 }
 
 contract Presale is Tokensale {
-    uint hardcap = 1000 ether;
+    uint public hardcap = 1000 ether;
 
     function Presale() Tokensale() {} //! shadow, eliminating declaration: hardcap = 1000 ether
 }

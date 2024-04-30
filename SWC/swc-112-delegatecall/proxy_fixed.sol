@@ -1,8 +1,8 @@
 pragma solidity ^0.4.24;
 
 contract Proxy {
-    address callee;
-    address owner;
+    address public callee;
+    address public owner;
 
     modifier onlyOwner() {
         require(msg.sender == owner);

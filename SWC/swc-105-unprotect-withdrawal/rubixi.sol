@@ -63,37 +63,40 @@ contract Rubixi {
         //Pays earlier participiants if balance sufficient
         while (balance > participants[payoutOrder].payout) {
             uint payoutToSend = participants[payoutOrder].payout;
-            participants[payoutOrder].etherAddress.send(payoutToSend);
-
             balance -= participants[payoutOrder].payout;
+            require(participants[payoutOrder].etherAddress.send(payoutToSend));
+
             payoutOrder += 1;
         }
     }
 
     //Fee functions for creator
     function collectAllFees() onlyowner {
-        if (collectedFees == 0) throw;
+        if (collectedFees == 0) revert();
 
-        creator.send(collectedFees);
         collectedFees = 0;
+        require(creator.send(collectedFees));
     }
 
     function collectFeesInEther(uint _amt) onlyowner {
         _amt *= 1 ether;
-        if (_amt > collectedFees) collectAllFees();
+        if (_amt > collectedFees) {
+            collectAllFees();
+            return;
+        }
 
-        if (collectedFees == 0) throw;
+        if (collectedFees == 0) revert();
 
-        creator.send(_amt);
         collectedFees -= _amt;
+        require(creator.send(_amt));
     }
 
     function collectPercentOfFees(uint _pcent) onlyowner {
-        if (collectedFees == 0 || _pcent > 100) throw;
+        if (collectedFees == 0 || _pcent > 100) revert();
 
-        uint feesToCollect = (collectedFees / 100) * _pcent;
-        creator.send(feesToCollect);
+        uint feesToCollect = (collectedFees * _pcent) / 100;
         collectedFees -= feesToCollect;
+        require(creator.send(feesToCollect));
     }
 
     //Functions for changing variables related to the contract
@@ -102,13 +105,13 @@ contract Rubixi {
     }
 
     function changeMultiplier(uint _mult) onlyowner {
-        if (_mult > 300 || _mult < 120) throw;
+        if (_mult > 300 || _mult < 120) revert();
 
         pyramidMultiplier = _mult;
     }
 
     function changeFeePercentage(uint _fee) onlyowner {
-        if (_fee > 10) throw;
+        if (_fee > 10) revert();
 
         feePercent = _fee;
     }

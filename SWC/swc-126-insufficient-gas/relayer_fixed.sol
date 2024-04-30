@@ -7,14 +7,14 @@
 pragma solidity ^0.5.0;
 
 contract Relayer {
-    uint transactionId;
+    uint public transactionId;
 
     struct Tx {
         bytes data;
         bool executed;
     }
 
-    mapping(uint => Tx) transactions;
+    mapping(uint => Tx) public transactions;
 
     function relay(Target target, bytes memory _data, uint _gasLimit) public {
         // replay protection; do not call the same transaction twice

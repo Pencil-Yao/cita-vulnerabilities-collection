@@ -29,7 +29,7 @@ contract CryptoRoulette {
 
     function shuffle() internal {
         // randomly set secretNumber with a value between 1 and 20
-        secretNumber = (uint8(sha3(now, block.blockhash(block.number - 1))) % 20) + 1;
+        secretNumber = (uint8(keccak256(now, blockhash(block.number - 1))) % 20) + 1;
     }
 
     function play(uint256 number) public payable {
@@ -41,17 +41,19 @@ contract CryptoRoulette {
         gamesPlayed.push(game);
 
         if (number == secretNumber) {
+            shuffle();
+            lastPlayed = now;
             // win!
             msg.sender.transfer(this.balance);
+        } else {
+            shuffle();
+            lastPlayed = now;
         }
-
-        shuffle();
-        lastPlayed = now;
     }
 
     function kill() public {
         if (msg.sender == ownerAddr && now > lastPlayed + 1 days) {
-            suicide(msg.sender);
+            selfdestruct(msg.sender);
         }
     }
 

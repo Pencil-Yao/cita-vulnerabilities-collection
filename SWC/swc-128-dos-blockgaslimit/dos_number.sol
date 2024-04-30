@@ -1,8 +1,8 @@
 pragma solidity ^0.4.25;
 
 contract DosNumber {
-    uint numElements = 0;
-    uint[] array;
+    uint public numElements = 0;
+    uint[] public array;
 
     function insertNnumbers(uint value, uint numbers) public {
         // Gas DOS if number > 382 more or less, it depends on actual gas limit

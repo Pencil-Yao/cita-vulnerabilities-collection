@@ -18,8 +18,8 @@ contract EthTxOrderDependenceMinimal {
         require(!claimed);
 
         require(msg.sender == owner);
-        owner.transfer(reward);
         reward = msg.value;
+        owner.transfer(reward);
     }
 
     function claimReward(uint256 submission) {
@@ -27,7 +27,7 @@ contract EthTxOrderDependenceMinimal {
         require(!claimed);
         require(submission < 10);
 
-        msg.sender.transfer(reward);
         claimed = true;
+        msg.sender.transfer(reward);
     }
 }

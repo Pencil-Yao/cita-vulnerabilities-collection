@@ -3,8 +3,8 @@ pragma solidity ^0.4.24;
 //This code is derived from the Capture the Ether https://capturetheether.com/challenges/math/mapping/
 
 contract Map {
-    address public owner;
-    uint256[] map;
+    address public owner = 0x0;
+    uint256[] public map;
 
     function set(uint256 key, uint256 value) public {
         if (map.length <= key) {

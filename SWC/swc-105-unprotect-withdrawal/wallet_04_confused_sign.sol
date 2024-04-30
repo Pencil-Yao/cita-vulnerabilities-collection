@@ -6,9 +6,9 @@ pragma solidity ^0.4.24;
 */
 
 contract Wallet {
-    address creator;
+    address public creator;
 
-    mapping(address => uint256) balances;
+    mapping(address => uint256) public balances;
 
     constructor() public {
         creator = msg.sender;
@@ -21,8 +21,8 @@ contract Wallet {
 
     function withdraw(uint256 amount) public {
         require(amount >= balances[msg.sender]); //! wrong comparison: amount <= balances[msg.sender]
-        msg.sender.transfer(amount);
         balances[msg.sender] -= amount;
+        msg.sender.transfer(amount);
     }
 
     // In an emergency the owner can migrate  allfunds to a different address.

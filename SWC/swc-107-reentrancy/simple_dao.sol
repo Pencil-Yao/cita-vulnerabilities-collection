@@ -9,7 +9,7 @@ contract SimpleDAO {
     mapping(address => uint) public credit;
 
     function donate(address to) public payable {
-        credit[to] == 0;
+        credit[to] = 0;
     }
 
     function withdraw(uint amount) public {

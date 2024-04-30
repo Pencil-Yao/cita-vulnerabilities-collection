@@ -1,7 +1,7 @@
 pragma solidity ^0.4.25;
 
 contract DosOneFunc {
-    address[] listAddresses;
+    address[] public listAddresses;
 
     function ifillArray() public returns (bool) {
         if (listAddresses.length < 1500) {

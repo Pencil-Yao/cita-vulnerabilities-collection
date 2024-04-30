@@ -1,8 +1,8 @@
 pragma solidity 0.4.24;
 
 contract ShadowingInFunctions {
-    uint n = 2;
-    uint x = 3;
+    uint public n = 2;
+    uint public x = 3;
 
     function test1() constant returns (uint n) {
         return n; //! Will return 0

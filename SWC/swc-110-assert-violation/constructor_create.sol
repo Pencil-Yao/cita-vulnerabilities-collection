@@ -6,7 +6,7 @@
 pragma solidity ^0.4.25;
 
 contract ConstructorCreate {
-    B b = new B();
+    B public b = new B();
 
     function check() {
         assert(b.foo() == 10);

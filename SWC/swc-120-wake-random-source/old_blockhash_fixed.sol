@@ -8,7 +8,7 @@ contract PredictTheBlockHashChallenge {
         bytes32 guess;
     }
 
-    mapping(address => guess) guesses;
+    mapping(address => guess) public guesses;
 
     constructor() public payable {
         require(msg.value == 1 ether);

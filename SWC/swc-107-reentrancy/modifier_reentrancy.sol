@@ -2,8 +2,7 @@ pragma solidity ^0.5.0;
 
 contract ModifierEntrancy {
     mapping(address => uint) public tokenBalance;
-    string constant name = "Nu Token";
-    Bank bank;
+    Bank private bank;
 
     constructor() public {
         bank = new Bank();

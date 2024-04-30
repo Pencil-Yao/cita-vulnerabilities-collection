@@ -8,8 +8,8 @@ import "./ECDSA.sol";
 
 contract AccessControl {
     using ECDSA for bytes32;
-    mapping(address => bool) isAdmin;
-    mapping(address => bool) isRegularUser;
+    mapping(address => bool) public isAdmin;
+    mapping(address => bool) public isRegularUser;
     // Add admins and regular users.
     function addUsers(
         address[] calldata admins,

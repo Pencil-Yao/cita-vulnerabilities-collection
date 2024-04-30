@@ -5,13 +5,13 @@
 pragma solidity ^0.4.22;
 
 contract MappingPerformance2sets {
-    mapping(bytes32 => uint) m0;
-    mapping(bytes32 => uint) m1;
-    mapping(bytes32 => uint) m2;
-    mapping(bytes32 => uint) m3;
-    mapping(bytes32 => uint) m4;
-    mapping(bytes32 => uint) m5;
-    uint b;
+    mapping(bytes32 => uint) public m0;
+    mapping(bytes32 => uint) public m1;
+    mapping(bytes32 => uint) public m2;
+    mapping(bytes32 => uint) public m3;
+    mapping(bytes32 => uint) public m4;
+    mapping(bytes32 => uint) public m5;
+    uint public b;
 
     constructor() {
         b = 10;

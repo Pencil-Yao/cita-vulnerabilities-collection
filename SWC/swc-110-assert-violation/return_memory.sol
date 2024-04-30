@@ -18,7 +18,7 @@ pragma solidity ^0.5.0;
 
 contract ReturnMemory {
     mapping(bytes32 => address) public slates;
-    bool everMatched = false;
+    bool public everMatched = false;
 
     function etch(address yay) public returns (bytes32 slate) {
         bytes32 hash = keccak256(abi.encodePacked(yay));

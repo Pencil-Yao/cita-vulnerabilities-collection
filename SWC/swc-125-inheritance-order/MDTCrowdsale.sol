@@ -446,11 +446,12 @@ contract Crowdsale {
         // calculate token amount to be created
         uint256 tokens = weiAmount.mul(rate);
 
+        TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
+
         // update state
         weiRaised = weiRaised.add(weiAmount);
 
         token.mint(beneficiary, tokens);
-        TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
 
         forwardFunds();
     }

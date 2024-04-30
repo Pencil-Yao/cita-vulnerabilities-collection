@@ -1,8 +1,8 @@
 pragma solidity ^0.4.24;
 
 contract transaction_malleablity {
-    mapping(address => uint256) balances;
-    mapping(bytes32 => bool) signatureUsed;
+    mapping(address => uint256) public balances;
+    mapping(bytes32 => bool) public signatureUsed;
 
     constructor(address[] owners, uint[] init) {
         require(owners.length == init.length);

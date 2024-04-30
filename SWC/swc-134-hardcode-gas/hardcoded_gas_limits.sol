@@ -9,8 +9,8 @@ interface ICallable {
 }
 
 contract HardcodedNotGood {
-    address payable _callable = 0xaAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa;
-    ICallable callable = ICallable(_callable);
+    address payable public _callable = 0xaAaAaAaaAaAaAaaAaAAAAAAAAaaaAaAaAaaAaaAa;
+    ICallable public callable = ICallable(_callable);
 
     constructor() public payable {}
 
@@ -19,12 +19,14 @@ contract HardcodedNotGood {
     }
 
     function doSend(uint256 amount) public {
-        _callable.send(amount);
+        require(_callable.send(amount));
     }
 
     function callLowLevel() public {
-        _callable.call.value(0).gas(10000)(""); //! hardcode gas
-        _callable.delegatecall.gas(10000)("");
+        (bool success, ) = _callable.call.value(0).gas(10000)(""); //! hardcode gas
+        require(success);
+        (bool success2, ) = _callable.delegatecall.gas(10000)("");
+        require(success2);
     }
 
     function callWithArgs() public {

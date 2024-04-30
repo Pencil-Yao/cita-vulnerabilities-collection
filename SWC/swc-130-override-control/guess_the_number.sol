@@ -5,8 +5,8 @@
 pragma solidity ^0.5.0;
 
 contract GuessTheNumber {
-    uint _secretNumber;
-    address payable _owner;
+    uint public _secretNumber;
+    address payable public _owner;
     event success(string);
     event wrongNumber(string);
 
@@ -38,8 +38,8 @@ contract GuessTheNumber {
         address payable guesser
     ) internal returns (bool) {
         if (n == _secretNumber) {
-            guesser.transfer(p);
             emit success("You guessed the correct number!");
+            guesser.transfer(p);
         } else {
             emit wrongNumber("You've made an incorrect guess!");
         }

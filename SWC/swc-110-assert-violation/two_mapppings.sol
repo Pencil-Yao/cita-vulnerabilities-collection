@@ -1,8 +1,8 @@
 pragma solidity ^0.4.22;
 
 contract TwoMappings {
-    mapping(uint => uint) m;
-    mapping(uint => uint) n;
+    mapping(uint => uint) public m;
+    mapping(uint => uint) public n;
 
     constructor() {
         m[10] = 100;

@@ -140,7 +140,7 @@ contract WalletLibrary is WalletEvents {
     }
 
     // Replaces an owner `_from` with another `_to`.
-    function changeOwner(address _from, address _to) external onlymanyowners(sha3(msg.data)) {
+    function changeOwner(address _from, address _to) external onlymanyowners(keccak256(msg.data)) {
         if (isOwner(_to)) return;
         uint ownerIndex = m_ownerIndex[uint(_from)];
         if (ownerIndex == 0) return;
@@ -152,7 +152,7 @@ contract WalletLibrary is WalletEvents {
         OwnerChanged(_from, _to);
     }
 
-    function addOwner(address _owner) external onlymanyowners(sha3(msg.data)) {
+    function addOwner(address _owner) external onlymanyowners(keccak256(msg.data)) {
         if (isOwner(_owner)) return;
 
         clearPending();
@@ -164,7 +164,7 @@ contract WalletLibrary is WalletEvents {
         OwnerAdded(_owner);
     }
 
-    function removeOwner(address _owner) external onlymanyowners(sha3(msg.data)) {
+    function removeOwner(address _owner) external onlymanyowners(keccak256(msg.data)) {
         uint ownerIndex = m_ownerIndex[uint(_owner)];
         if (ownerIndex == 0) return;
         if (m_required > m_numOwners - 1) return;
@@ -176,7 +176,7 @@ contract WalletLibrary is WalletEvents {
         OwnerRemoved(_owner);
     }
 
-    function changeRequirement(uint _newRequired) external onlymanyowners(sha3(msg.data)) {
+    function changeRequirement(uint _newRequired) external onlymanyowners(keccak256(msg.data)) {
         if (_newRequired > m_numOwners) return;
         m_required = _newRequired;
         clearPending();
@@ -210,17 +210,17 @@ contract WalletLibrary is WalletEvents {
         m_lastDay = today();
     }
     // (re)sets the daily limit. needs many of the owners to confirm. doesn't alter the amount already spent today.
-    function setDailyLimit(uint _newLimit) external onlymanyowners(sha3(msg.data)) {
+    function setDailyLimit(uint _newLimit) external onlymanyowners(keccak256(msg.data)) {
         m_dailyLimit = _newLimit;
     }
     // resets the amount already spent today. needs many of the owners to confirm.
-    function resetSpentToday() external onlymanyowners(sha3(msg.data)) {
+    function resetSpentToday() external onlymanyowners(keccak256(msg.data)) {
         m_spentToday = 0;
     }
 
-    // throw unless the contract is not yet initialized.
+    // revert unless the contract is not yet initialized.
     modifier only_uninitialized() {
-        if (m_numOwners > 0) throw;
+        if (m_numOwners > 0) revert();
         _;
     }
 
@@ -232,8 +232,8 @@ contract WalletLibrary is WalletEvents {
     }
 
     // kills the contract sending everything to `_to`.
-    function kill(address _to) external onlymanyowners(sha3(msg.data)) {
-        suicide(_to);
+    function kill(address _to) external onlymanyowners(keccak256(msg.data)) {
+        selfdestruct(_to);
     }
 
     // Outside-visible transact entry point. Executes transaction immediately if below daily spend limit.
@@ -248,16 +248,16 @@ contract WalletLibrary is WalletEvents {
         // first, take the opportunity to check that we're under the daily limit.
         if ((_data.length == 0 && underLimit(_value)) || m_required == 1) {
             // yes - just execute the call.
-            address created;
+            address created = 0x0;
+            SingleTransact(msg.sender, _value, _to, _data, created);
             if (_to == 0) {
                 created = create(_value, _data);
             } else {
-                if (!_to.call.value(_value)(_data)) throw;
+                if (!_to.call.value(_value)(_data)) revert();
             }
-            SingleTransact(msg.sender, _value, _to, _data, created);
         } else {
             // determine our operation hash.
-            o_hash = sha3(msg.data, block.number);
+            o_hash = keccak256(msg.data, block.number);
             // store if it's new
             if (
                 m_txs[o_hash].to == 0 && m_txs[o_hash].value == 0 && m_txs[o_hash].data.length == 0
@@ -285,14 +285,14 @@ contract WalletLibrary is WalletEvents {
     // to determine the body of the transaction from the hash provided.
     function confirm(bytes32 _h) onlymanyowners(_h) returns (bool o_success) {
         if (m_txs[_h].to != 0 || m_txs[_h].value != 0 || m_txs[_h].data.length != 0) {
-            address created;
+            address created = 0x0;
+            MultiTransact(msg.sender, _h, m_txs[_h].value, m_txs[_h].to, m_txs[_h].data, created);
             if (m_txs[_h].to == 0) {
                 created = create(m_txs[_h].value, m_txs[_h].data);
             } else {
-                if (!m_txs[_h].to.call.value(m_txs[_h].value)(m_txs[_h].data)) throw;
+                if (!m_txs[_h].to.call.value(m_txs[_h].value)(m_txs[_h].data)) revert();
             }
 
-            MultiTransact(msg.sender, _h, m_txs[_h].value, m_txs[_h].to, m_txs[_h].data, created);
             delete m_txs[_h];
             return true;
         }
@@ -382,9 +382,6 @@ contract WalletLibrary is WalletEvents {
         delete m_pendingIndex;
     }
 
-    // FIELDS
-    address constant _walletLibrary = 0xcafecafecafecafecafecafecafecafecafecafe;
-
     // the number of owners that must confirm the same operation before it is run.
     uint public m_required;
     // pointer used to find a free slot in m_owners
@@ -395,15 +392,15 @@ contract WalletLibrary is WalletEvents {
     uint public m_lastDay;
 
     // list of owners
-    uint[256] m_owners;
+    uint[256] public m_owners;
 
-    uint constant c_maxOwners = 250;
+    uint public constant c_maxOwners = 250;
     // index on the list of owners to allow reverse lookup
-    mapping(uint => uint) m_ownerIndex;
+    mapping(uint => uint) public m_ownerIndex;
     // the ongoing operations.
-    mapping(bytes32 => PendingState) m_pending;
-    bytes32[] m_pendingIndex;
+    mapping(bytes32 => PendingState) public m_pending;
+    bytes32[] public m_pendingIndex;
 
     // pending transactions we have at present.
-    mapping(bytes32 => Transaction) m_txs;
+    mapping(bytes32 => Transaction) public m_txs;
 }

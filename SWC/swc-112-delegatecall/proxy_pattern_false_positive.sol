@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 contract proxy {
-    address owner;
+    address public owner = 0x0;
 
     function proxyCall(address _to, bytes _data) external {
         require(!_to.delegatecall(_data));
