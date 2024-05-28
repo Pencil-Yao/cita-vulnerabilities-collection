@@ -25,8 +25,11 @@ contract HardcodedNotGood {
     function callLowLevel() public {
         (bool success, ) = _callable.call.value(0).gas(10000)(""); //! hardcode gas
         require(success);
-        (bool success2, ) = _callable.delegatecall.gas(10000)("");
-        require(success2);
+    }
+
+    function callLowLevelDelegate() public {
+        (bool success, ) = _callable.delegatecall.gas(10000)("");
+        require(success);
     }
 
     function callWithArgs() public {
