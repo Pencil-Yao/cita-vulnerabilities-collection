@@ -1,4 +1,4 @@
-SWC-115
+SWC-115 Authorization through tx.origin
 ========
 
 标题

@@ -1,11 +1,10 @@
-Z-12
+Z-12 Usage of Continue in the DO-WHILE Loop
 ========
 
 标题
 ----
 
-Z12 在 DO-WHILE 循环中 Continue 的用法（Usage of Continue in the
-DO-WHILE Loop）
+Z12 在 DO-WHILE 循环中 Continue 的用法（Usage of Continue in the DO-WHILE Loop）
 
 漏洞等级
 --------

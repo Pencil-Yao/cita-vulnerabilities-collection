@@ -1,11 +1,10 @@
-SWC-120
+SWC-120 Weak Sources of Randomness from Chain Attributes
 ========
 
 标题
 ----
 
-SWC-120 基于链属性的弱随机性（Weak Sources of Randomness from Chain
-Attributes）
+SWC-120 基于链属性的弱随机性（Weak Sources of Randomness from Chain Attributes）
 
 漏洞等级
 --------

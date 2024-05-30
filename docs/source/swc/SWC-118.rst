@@ -1,4 +1,4 @@
-SWC-118
+SWC-118 Incorrect Constructor Name
 ========
 
 标题

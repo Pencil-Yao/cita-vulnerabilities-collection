@@ -1,18 +1,18 @@
-SWC-105
+SWC-105 Unprotected Ether Withdrawal
 ========
 
 标题
-====
+----
 
 SWC-105 无保护的以太币提款（Unprotected Ether Withdrawal）
 
 漏洞等级
-========
+--------
 
 低
 
 描述
-====
+----
 
 由于缺少访问控制或访问控制不充分，恶意方可以从合约账户中提取部分或全部以太币。
 
@@ -20,26 +20,26 @@ SWC-105 无保护的以太币提款（Unprotected Ether Withdrawal）
 构造函数代码将以运行时字节代码结尾，并且任何人都可以调用它来重新初始化合约。
 
 CWE漏洞分类
-===========
+-----------
 
 `CWE-284：访问控制不当 <https://cwe.mitre.org/data/definitions/284.html>`__
 
 修改建议
-========
+--------
 
 增加访问控制，以便提款只能由授权方或根据智能合约系统的规范来触发。
 
 参考链接
-========
+--------
 
 -  `Rubixi
    智能合约 <https://etherscan.io/address/0xe82719202e5965Cf5D9B6673B7503a3b92DE20be#code>`__
 
 案例
-====
+----
 
 tokensalechallenge.sol
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -77,7 +77,7 @@ tokensalechallenge.sol
    }
 
 rubixi.sol
-----------
+~~~~~~~~~~
 
 ::
 

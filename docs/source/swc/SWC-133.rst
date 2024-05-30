@@ -1,11 +1,10 @@
-SWC-133
+SWC-133 Hash Collisions With Multiple Variable Length Arguments
 ========
 
 标题
 ----
 
-SWC-133 变长参数导致的哈希冲突（Hash Collisions With Multiple Variable
-Length Arguments）
+SWC-133 变长参数导致的哈希冲突（Hash Collisions With Multiple Variable Length Arguments）
 
 漏洞等级
 --------

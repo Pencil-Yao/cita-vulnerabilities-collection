@@ -1,4 +1,4 @@
-SWC-106
+SWC-106 Unprotected SELFDESTRUCT Instruction
 ========
 
 标题

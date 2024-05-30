@@ -1,11 +1,10 @@
-SWC-134
+SWC-134 Message call with hardcoded gas amount
 ========
 
 标题
 ----
 
-SWC-134 硬编码gas用量的消息调用（Message call with hardcoded gas
-amount）
+SWC-134 硬编码gas用量的消息调用（Message call with hardcoded gas amount）
 
 漏洞等级
 --------

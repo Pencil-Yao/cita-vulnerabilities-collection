@@ -1,4 +1,4 @@
-SWC-117
+SWC-117 Signature Malleability
 ========
 
 标题

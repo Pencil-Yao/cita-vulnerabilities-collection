@@ -1,4 +1,4 @@
-Z-08
+Z-08 delegatecall used inside a loop
 ========
 
 标题

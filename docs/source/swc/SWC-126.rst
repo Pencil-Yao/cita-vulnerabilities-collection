@@ -1,4 +1,4 @@
-SWC-126
+SWC-126 Insufficient Gas Griefing
 ========
 
 标题

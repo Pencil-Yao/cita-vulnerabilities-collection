@@ -1,11 +1,10 @@
-SWC-127
+SWC-127 Arbitrary Jump with Function Type Variable
 ========
 
 标题
 ----
 
-SWC-127 函数类型变量任意跳转（Arbitrary Jump with Function Type
-Variable）
+SWC-127 函数类型变量任意跳转（Arbitrary Jump with Function Type Variable）
 
 漏洞等级
 --------

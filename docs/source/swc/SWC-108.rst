@@ -1,4 +1,4 @@
-SWC-108
+SWC-108 State Variable Default Visibility
 ========
 
 标题

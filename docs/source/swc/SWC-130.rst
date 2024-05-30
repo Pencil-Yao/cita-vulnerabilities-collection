@@ -1,11 +1,10 @@
-SWC-130
+SWC-130 Right-To-Left-Override control character(U+202E)
 ========
 
 标题
 ----
 
-SWC-130 使用反向控制字符（Right-To-Left-Override control character
-(U+202E)）
+SWC-130 使用反向控制字符（Right-To-Left-Override control character(U+202E)）
 
 漏洞等级
 --------

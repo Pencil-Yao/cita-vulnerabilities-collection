@@ -1,11 +1,10 @@
-Z-10
+Z-10 Not Follow the EIP-712 Signature Encoding Specification
 ========
 
 标题
 ----
 
-Z10 不遵循 EIP-712 签名编码规范（Not Follow the EIP-712 Signature
-Encoding Specification）
+Z10 不遵循 EIP-712 签名编码规范（Not Follow the EIP-712 Signature Encoding Specification）
 
 漏洞等级
 --------

@@ -1,4 +1,4 @@
-SWC-125
+SWC-125 Incorrect Inheritance Order
 ========
 
 标题
