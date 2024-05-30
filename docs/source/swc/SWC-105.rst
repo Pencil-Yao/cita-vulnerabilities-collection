@@ -237,7 +237,7 @@ rubixi.sol
    }
 
 multiowned_not_vulnerable.sol
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -299,7 +299,7 @@ multiowned_not_vulnerable.sol
    }
 
 multiowned_vulnerable.sol
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -361,7 +361,7 @@ multiowned_vulnerable.sol
    }
 
 simple_ether_drain.sol
-----------------------
+~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -379,7 +379,7 @@ simple_ether_drain.sol
    }
 
 wallet_01_ok.sol
-----------------
+~~~~~~~~~~~~~~~~
 
 ::
 
@@ -424,7 +424,7 @@ wallet_01_ok.sol
    }
 
 wallet_02_refund_nosub.sol
---------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -469,7 +469,7 @@ wallet_02_refund_nosub.sol
    }
 
 wallet_03_wrong_constructor.sol
--------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -509,7 +509,7 @@ wallet_03_wrong_constructor.sol
    }
 
 wallet_04_confused_sign.sol
----------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
