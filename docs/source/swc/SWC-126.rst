@@ -1,0 +1,124 @@
+SWC-126
+========
+
+标题
+----
+
+SWC-126 gas不足（Insufficient Gas Griefing）
+
+漏洞等级
+--------
+
+低
+
+描述
+----
+
+gas不足攻击可以在一个接受数据并在另一个合约的子调用中使用该数据的合约上执行。如果子调用失败，则将整个交易还原或继续执行。在中继器合约的情况下，执行交易的用户（“转发者”）可以通过仅使用足够的gas来执行交易来有效地审查交易，但不足以使子调用成功。
+
+CWE漏洞分类
+-----------
+
+`CCWE-691：控制流管理不足 <https://cwe.mitre.org/data/definitions/691.html>`__
+
+修改建议
+--------
+
+有两种方法可以防止gas不足：
+
+-  仅允许受信任的用户中继交易。
+-  要求转发人提供足够的gas。
+
+参考链接
+--------
+
+-  `Consensys智能合约最佳实践 <https://consensys.github.io/smart-contract-best-practices/attacks/griefing/>`__
+-  `griefing是什么意思？ <https://ethereum.stackexchange.com/questions/62829/what-does-griefing-mean>`__
+-  `griefing攻击：攻击者可以获利吗？ <https://ethereum.stackexchange.com/questions/73261/griefing-attacks-are-they-profitable-for-the-attacker>`__
+
+案例
+----
+
+relayer.sol
+~~~~~~~~~~~
+
+::
+
+   /*
+    * @source: https://consensys.github.io/smart-contract-best-practices/known_attacks/#insufficient-gas-griefing
+    * @author: ConsenSys Diligence
+    * Modified by Kaden Zipfel
+    */
+
+   pragma solidity ^0.5.0;
+
+   contract Relayer {
+       uint transactionId;
+
+       struct Tx {
+           bytes data;
+           bool executed;
+       }
+
+       mapping (uint => Tx) transactions;
+
+       function relay(Target target, bytes memory _data) public returns(bool) {
+           // replay protection; do not call the same transaction twice
+           require(transactions[transactionId].executed == false, 'same transaction twice');
+           transactions[transactionId].data = _data;
+           transactions[transactionId].executed = true;
+           transactionId += 1;
+
+           (bool success, ) = address(target).call(abi.encodeWithSignature("execute(bytes)", _data));
+           return success;
+       }
+   }
+
+   // Contract called by Relayer
+   contract Target {
+       function execute(bytes memory _data) public {
+           // Execute contract code
+       }
+   }
+
+relayer_fixed.sol
+~~~~~~~~~~~~~~~~~
+
+::
+
+   /*
+    * @source: https://consensys.github.io/smart-contract-best-practices/known_attacks/#insufficient-gas-griefing
+    * @author: ConsenSys Diligence
+    * Modified by Kaden Zipfel
+    */
+
+   pragma solidity ^0.5.0;
+
+   contract Relayer {
+       uint transactionId;
+
+       struct Tx {
+           bytes data;
+           bool executed;
+       }
+
+       mapping (uint => Tx) transactions;
+
+       function relay(Target target, bytes memory _data, uint _gasLimit) public {
+           // replay protection; do not call the same transaction twice
+           require(transactions[transactionId].executed == false, 'same transaction twice');
+           transactions[transactionId].data = _data;
+           transactions[transactionId].executed = true;
+           transactionId += 1;
+
+           address(target).call(abi.encodeWithSignature("execute(bytes)", _data, _gasLimit));
+       }
+   }
+
+   // Contract called by Relayer
+   contract Target {
+       function execute(bytes memory _data, uint _gasLimit) public {
+           require(gasleft() >= _gasLimit, 'not enough gas');
+           // Execute contract code
+       }
+   }

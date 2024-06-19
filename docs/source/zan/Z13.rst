@@ -1,0 +1,46 @@
+Z-13
+========
+
+标题
+----
+
+Z13 可重写的私有函数（Private Function Can Be Overridden）
+
+漏洞等级
+--------
+
+高
+
+描述
+----
+
+从编译器版本 0.3.0 到
+0.5.16，虽然基础合约的私有方法不可见，也不能直接从派生合约中调用，但仍然可以声明一个同名同类型的函数，从而改变基础合约函数的行为。
+
+修改建议
+--------
+
+从编译器版本 0.3.0 到
+0.5.16，在子合同中定义函数时，有必要不覆盖基础合同中的私有函数。
+
+案例
+----
+
+OverridePrivateFunctionInParentContract_Issue.sol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+   pragma solidity 0.5.0;
+
+   contract A {
+       function bad1(uint a) private returns (uint) {
+           return a + 10;
+       }
+   }
+
+   contract B is A {
+       function bad1(uint a) private returns (uint) { //leak
+           return a + 1;
+       }
+   }

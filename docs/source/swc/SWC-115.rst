@@ -1,0 +1,97 @@
+SWC-115
+========
+
+标题
+----
+
+SWC-115 利用tx.origin授权（Authorization through tx.origin）
+
+漏洞等级
+--------
+
+中
+
+描述
+----
+
+``tx.origin``\ 是 Solidity
+中的一个全局变量，用于返回发送交易的账户地址。如果授权账户调用恶意合约，使用该变量进行授权可能会使合约受到攻击。由于\ ``tx.origin``\ 返回的是交易的原始发送者（在本例中是授权账户），因此可以调用通过授权检查的易受攻击合约。
+
+CWE漏洞分类
+-----------
+
+`CWE-477：过时功能的使用 <https://cwe.mitre.org/data/definitions/477.html>`__
+
+修改建议
+--------
+
+``tx.origin``\ 不应用于授权。使用\ ``msg.sender``\ 代替。
+
+参考链接
+--------
+
+-  `Solidity文档 -
+   tx.origin <https://solidity.readthedocs.io/en/develop/security-considerations.html#tx-origin>`__
+-  `以太坊智能合约最佳实践 -
+   避免使用tx.origin <https://consensys.github.io/smart-contract-best-practices/development-recommendations/solidity-specific/tx-origin/>`__
+-  `SigmaPrime -
+   可见性 <https://github.com/sigp/solidity-security-blog#tx-origin>`__
+
+案例
+----
+
+mycontract.sol
+~~~~~~~~~~~~~~
+
+::
+
+   /*
+    * @source: https://consensys.github.io/smart-contract-best-practices/recommendations/#avoid-using-txorigin
+    * @author: Consensys Diligence  
+    * Modified by Gerhard Wagner
+    */
+
+   pragma solidity 0.4.24;
+
+   contract MyContract {
+
+       address owner;
+
+       function MyContract() public {
+           owner = msg.sender;
+       }
+
+       function sendTo(address receiver, uint amount) public {
+           require(tx.origin == owner);
+           receiver.transfer(amount);
+       }
+
+   }
+
+mycontract_fixed.sol
+~~~~~~~~~~~~~~~~~~~~
+
+::
+
+   /*
+    * @source: https://consensys.github.io/smart-contract-best-practices/recommendations/#avoid-using-txorigin
+    * @author: Consensys Diligence
+    * Modified by Gerhard Wagner
+    */
+
+   pragma solidity 0.4.25;
+
+   contract MyContract {
+
+       address owner;
+
+       function MyContract() public {
+           owner = msg.sender;
+       }
+
+       function sendTo(address receiver, uint amount) public {
+         require(msg.sender == owner);
+         receiver.transfer(amount);
+       }
+
+   }

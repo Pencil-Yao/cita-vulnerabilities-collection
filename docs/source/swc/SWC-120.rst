@@ -1,0 +1,233 @@
+SWC-120
+========
+
+标题
+----
+
+SWC-120 基于链属性的弱随机性（Weak Sources of Randomness from Chain
+Attributes）
+
+漏洞等级
+--------
+
+低
+
+描述
+----
+
+生成随机数的能力在各种应用中都非常有用。一个明显的例子是博彩DApp，其中使用伪随机数生成器选择获胜者。但是，在以太坊中创建足够强大的随机性来源非常具有挑战性。例如，使用\ ``block.timestamp``\ 是不安全的，因为矿工可以选择在几秒钟内提供任何时间戳，而仍然使他的区块被其他人接受。使用\ ``blockhash``\ 、\ ``block.difficulty``\ 以及其他字段也是不安全的，因为它们是由矿工控制。如果下注很高，那么该矿工可以在短时间内通过租用硬件来挖掘很多区块，选择所需的区块哈希值，然后放弃所有其他区块。
+
+CWE漏洞分类
+-----------
+
+`CWE-330：使用弱随机值 <https://cwe.mitre.org/data/definitions/330.html>`__
+
+修改建议
+--------
+
+-  通过预言机（oracle）使用外部随机源，并在链上对预言机的结果进行密码学检查。例如\ `Chainlink
+   VRF <https://docs.chain.link/docs/chainlink-vrf>`__\ 。这种方法并不依赖于对预言机的信任，因为虚假生成的随机数会被系统的链上部分拒绝。
+-  使用\ `承诺方案（Commitment_scheme） <https://en.wikipedia.org/wiki/Commitment_scheme>`__\ ，例如\ `RANDAO <https://github.com/randao/randao>`__\ 。
+-  通过预言机（oracle）使用外部随机性源，例如\ `Oraclize <http://www.oraclize.it/>`__\ 。请注意，此方法需要信任oracle，
+   因此使用多个oracle是合理的。
+-  使用比特币区块哈希，因为它们的挖矿成本更高。
+
+参考链接
+--------
+
+-  `如何在我的智能合约中安全地生成随机数？ <https://ethereum.stackexchange.com/questions/191/how-can-i-securely-generate-a-random-number-in-my-smart-contract>`__
+-  `什么时候可以安全地将BLOCKHASH用作随机数？什么时候不安全？ <https://ethereum.stackexchange.com/questions/419/when-can-blockhash-be-safely-used-for-a-random-number-when-would-it-be-unsafe>`__
+-  `智能合约运行 <https://etherscan.io/address/0xcac337492149bdb66b088bf5914bedfbf78ccc18>`__
+
+案例
+----
+
+guess_the_random_number.sol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+
+   /*
+    * @source: https://capturetheether.com/challenges/lotteries/guess-the-random-number/
+    * @author: Steve Marx
+    */
+
+   pragma solidity ^0.4.21;
+
+   contract GuessTheRandomNumberChallenge {
+       uint8 answer;
+
+       function GuessTheRandomNumberChallenge() public payable {
+           require(msg.value == 1 ether);
+           answer = uint8(keccak256(block.blockhash(block.number - 1), now));
+       }
+
+       function isComplete() public view returns (bool) {
+           return address(this).balance == 0;
+       }
+
+       function guess(uint8 n) public payable {
+           require(msg.value == 1 ether);
+
+           if (n == answer) {
+               msg.sender.transfer(2 ether);
+           }
+       }
+   }
+
+guess_the_random_number_fixed.sol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+   /*
+    * @source: https://capturetheether.com/challenges/lotteries/guess-the-random-number/
+    * @author: Steve Marx
+    */
+
+   pragma solidity ^0.4.25;
+
+   contract GuessTheRandomNumberChallenge {
+       uint8 answer;
+       uint8 commitedGuess;
+       uint commitBlock;
+       address guesser;
+
+       function GuessTheRandomNumberChallenge() public payable {
+           require(msg.value == 1 ether);
+       }
+
+       function isComplete() public view returns (bool) {
+           return address(this).balance == 0;
+       }
+
+       //Guess the modulo of the blockhash 20 blocks from your guess
+       function guess(uint8 _guess) public payable {
+           require(msg.value == 1 ether);
+           commitedGuess = _guess;
+           commitBlock = block.number;
+           guesser = msg.sender;
+       }
+       function recover() public {
+         //This must be called after the guessed block and before commitBlock+20's blockhash is unrecoverable
+         require(block.number > commitBlock + 20 && commitBlock+20 > block.number - 256);
+         require(guesser == msg.sender);
+
+         if(uint(blockhash(commitBlock+20)) == commitedGuess){
+           msg.sender.transfer(2 ether);
+         }
+       }
+   }
+
+old_blockhash.sol
+~~~~~~~~~~~~~~~~~
+
+::
+
+   pragma solidity ^0.4.24;
+
+   //Based on the the Capture the Ether challange at https://capturetheether.com/challenges/lotteries/predict-the-block-hash/
+   //Note that while it seems to have a 1/2^256 chance you guess the right hash, actually blockhash returns zero for blocks numbers that are more than 256 blocks ago so you can guess zero and wait.
+   contract PredictTheBlockHashChallenge {
+
+       struct guess{
+         uint block;
+         bytes32 guess;
+       }
+
+       mapping(address => guess) guesses;
+
+       constructor() public payable {
+           require(msg.value == 1 ether);
+       }
+
+       function lockInGuess(bytes32 hash) public payable {
+           require(guesses[msg.sender].block == 0);
+           require(msg.value == 1 ether);
+
+           guesses[msg.sender].guess = hash;
+           guesses[msg.sender].block  = block.number + 1;
+       }
+
+       function settle() public {
+           require(block.number > guesses[msg.sender].block);
+
+           bytes32 answer = blockhash(guesses[msg.sender].block);
+
+           guesses[msg.sender].block = 0;
+           if (guesses[msg.sender].guess == answer) {
+               msg.sender.transfer(2 ether);
+           }
+       }
+   }
+
+old_blockhash_fixed.sol
+~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+   pragma solidity ^0.4.24;
+
+   //Based on the the Capture the Ether challange at https://capturetheether.com/challenges/lotteries/predict-the-block-hash/
+   //Note that while it seems to have a 1/2^256 chance you guess the right hash, actually blockhash returns zero for blocks numbers that are more than 256 blocks ago so you can guess zero and wait.
+   contract PredictTheBlockHashChallenge {
+
+       struct guess{
+         uint block;
+         bytes32 guess;
+       }
+
+       mapping(address => guess) guesses;
+
+       constructor() public payable {
+           require(msg.value == 1 ether);
+       }
+
+       function lockInGuess(bytes32 hash) public payable {
+           require(guesses[msg.sender].block == 0);
+           require(msg.value == 1 ether);
+
+           guesses[msg.sender].guess = hash;
+           guesses[msg.sender].block  = block.number + 1;
+       }
+
+       function settle() public {
+           require(block.number > guesses[msg.sender].block +10);
+           //Note that this solution prevents the attack where blockhash(guesses[msg.sender].block) is zero
+           //Also we add ten block cooldown period so that a minner cannot use foreknowlege of next blockhashes
+           if(guesses[msg.sender].block - block.number < 256){
+             bytes32 answer = blockhash(guesses[msg.sender].block);
+
+             guesses[msg.sender].block = 0;
+             if (guesses[msg.sender].guess == answer) {
+                 msg.sender.transfer(2 ether);
+             }
+           }
+           else{
+             revert("Sorry your lottery ticket has expired");
+           }
+       }
+   }
+
+random_number_generator.sol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+   pragma solidity ^0.4.25;
+
+   // Based on TheRun contract deployed at 0xcac337492149bDB66b088bf5914beDfBf78cCC18.
+   contract RandomNumberGenerator {
+     uint256 private salt =  block.timestamp;
+
+     function random(uint max) view private returns (uint256 result) {
+       // Get the best seed for randomness
+       uint256 x = salt * 100 / max;
+       uint256 y = salt * block.number / (salt % 5);
+       uint256 seed = block.number / 3 + (salt % 300) + y;
+       uint256 h = uint256(blockhash(seed));
+       // Random number between 1 and max
+       return uint256((h / x)) % max + 1;
+     }
+   }

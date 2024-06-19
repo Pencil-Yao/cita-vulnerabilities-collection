@@ -1,0 +1,181 @@
+SWC-131
+========
+
+标题
+----
+
+SWC-131 存在未使用的变量（Presence of unused variables）
+
+漏洞等级
+--------
+
+高
+
+描述
+----
+
+Solidity中允许存在未使用的变量，并且它们不会带来直接的安全问题。但最好的做法是尽量避免使用它们，因为：
+
+-  导致计算量增加（以及不必要的gas消耗）
+-  表示错误或数据结构不正确，通常表示代码质量不佳
+-  导致代码噪音并降低代码的可读性
+
+CWE漏洞分类
+-----------
+
+`CWE-1164：不相关的代码 <https://cwe.mitre.org/data/definitions/1164.html>`__
+
+修改建议
+--------
+
+从代码库中删除所有未使用的变量。
+
+参考链接
+--------
+
+-  `讨论：未使用的局部变量警告 <https://github.com/ethereum/solidity/issues/718>`__
+-  `讨论：影子继承状态变量 <https://github.com/ethereum/solidity/issues/2563>`__
+
+案例
+----
+
+unused_state_variables.sol
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+   pragma solidity >=0.5.0;
+   pragma experimental ABIEncoderV2;
+
+   import "./base.sol";
+
+   contract DerivedA is Base {
+       // i is not used in the current contract
+       A i = A(1);
+
+       int internal j = 500;
+       
+       function call(int a) public {
+           assign1(a);
+       }
+       
+       function assign3(A memory x) public returns (uint) {
+           return g[1] + x.a + uint(j);
+       }
+
+       function ret() public returns (int){
+           return this.e();
+
+       }
+       
+   }
+
+unused_state_variables_fixed.sol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+   pragma solidity >=0.5.0;
+   pragma experimental ABIEncoderV2;
+
+   import "./base_fixed.sol";
+
+   contract DerivedA is Base {
+
+       int internal j = 500;
+       
+       function call(int a) public {
+           assign1(a);
+       }
+       
+       function assign3(A memory x) public returns (uint) {
+           return g[1] + x.a + uint(j);
+       }
+
+       function ret() public returns (int){
+           return this.e();
+
+       }
+       
+   }
+
+unused_variables.sol
+~~~~~~~~~~~~~~~~~~~~
+
+::
+
+   pragma solidity ^0.5.0;
+
+   contract UnusedVariables {
+       int a = 1;
+
+       // y is not used
+       function unusedArg(int x, int y) public view returns (int z) {
+           z = x + a;  
+       }
+
+       // n is not reported it is part of another SWC category
+       function unusedReturn(int x, int y) public pure returns (int m, int n, int o) {
+           m = y - x;
+           o = m/2;
+       }
+
+       // x is not accessed 
+       function neverAccessed(int test) public pure returns (int) {
+           int z = 10;
+
+           if (test > z) {
+               // x is not used
+               int x = test - z;
+
+               return test - z;
+           }
+
+           return z;
+       }
+       
+       function tupleAssignment(int p) public returns (int q, int r){
+           (q, , r) = unusedReturn(p,2);
+           
+       }
+
+
+   }
+
+unused_variables_fixed.sol
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+   pragma solidity ^0.5.0;
+
+   contract UnusedVariables {
+       int a = 1;
+
+       function unusedArg(int x) public view returns (int z) {
+           z = x + a;  
+       }
+
+       // n is not reported it is part of another SWC category
+       function unusedReturn(int x, int y) public pure returns (int m, int n,int o) {
+           m = y - x;
+           o = m/2;
+       }
+
+       // x is not accessed 
+       function neverAccessed(int test) public pure returns (int) {
+           int z = 10;
+
+           if (test > z) {
+               return test - z;
+           }
+
+           return z;
+       }
+       
+       function tupleAssignment(int p) public returns (int q, int r){
+           (q, , r) = unusedReturn(p,2);
+           
+       }
+
+   }

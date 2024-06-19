@@ -1,0 +1,109 @@
+SWC-116
+========
+
+标题
+----
+
+SWC-116 使用区块值作为时间计量（Block values as a proxy for time）
+
+漏洞等级
+--------
+
+低
+
+描述
+----
+
+合约通常需要访问时间值以执行某些类型的功能。\ ``block.timestamp``\ 和\ ``block.number``\ 这样的值可以使你了解当前时间或时间增量，但是，在大多数情况下使用它们并不安全。
+
+对于\ ``block.timestamp``\ ，开发人员经常尝试使用它来触发时间相关的事件。由于以太坊是去中心化的，节点只能在某种程度上同步时间。此外，恶意矿工可以更改其区块的时间戳，特别是如果他们可以通过这样做获益的话。但是，矿工不能将时间戳设置为比前一个时间戳小（否则该区块将被拒绝），也不能将时间戳设置得太远。考虑到以上所有因素，开发人员无法依赖所提供时间戳的准确性。
+
+至于\ ``block.number``\ ，以太坊的区块时间通常约为14秒，因此可以预测区块之间的时间增量。但是，区块时间不是恒定的，并且由于各种原因（例如，分叉重组和难度炸弹）可能会发生变化。由于块时间可变，因此也不应该依赖于\ ``block.number``\ 进行精确的时间计算。
+
+CWE漏洞分类
+-----------
+
+`CWE-829：包含来不受信域的功能 <https://cwe.mitre.org/data/definitions/829.html>`__
+
+修改建议
+--------
+
+开发人员应在编写智能合约时注意区块值并不精确，使用它们会导致意想不到的结果。作为替代方案，在需要使用精确时间时，可以使用预言机/Oracle。
+
+参考链接
+--------
+
+-  `安全性：时间戳依赖性 <https://github.com/ethereum/wiki/wiki/Safety#timestamp-dependence>`__
+-  `以太坊智能合约最佳实践 -
+   时间戳依赖性 <https://consensys.github.io/smart-contract-best-practices/development-recommendations/solidity-specific/timestamp-dependence/>`__
+-  `以太坊挖矿节点如何维持与网络一致的时间？ <https://ethereum.stackexchange.com/questions/5924/how-do-ethereum-mining-nodes-maintain-a-time-consistent-with-the-network/5926#5926>`__
+-  `Solidity：时间戳依赖性，是否可以安全实现？ <https://ethereum.stackexchange.com/questions/15047/solidity-timestamp-dependency-is-it-possible-to-do-safely>`__
+-  `避免使用block.number作为时间戳 <https://consensys.github.io/smart-contract-best-practices/development-recommendations/solidity-specific/timestamp-dependence/#avoid-using-blocknumber-as-a-timestamp>`__
+
+案例
+----
+
+time_lock.sol
+~~~~~~~~~~~~~
+
+::
+
+   /*
+    * @author: Kaden Zipfel
+    */
+
+   pragma solidity ^0.5.0;
+
+   contract TimeLock {
+       struct User {
+           uint amount; // amount locked (in eth)
+           uint unlockBlock; // minimum block to unlock eth
+       }
+
+       mapping(address => User) private users;
+
+       // Tokens should be locked for exact time specified
+       function lockEth(uint _time, uint _amount) public payable {
+           require(msg.value == _amount, 'must send exact amount');
+           users[msg.sender].unlockBlock = block.number + (_time / 14);
+           users[msg.sender].amount = _amount;
+       }
+
+       // Withdraw tokens if lock period is over
+       function withdraw() public {
+           require(users[msg.sender].amount > 0, 'no amount locked');
+           require(block.number >= users[msg.sender].unlockBlock, 'lock period not over');
+
+           uint amount = users[msg.sender].amount;
+           users[msg.sender].amount = 0;
+           (bool success, ) = msg.sender.call.value(amount)("");
+           require(success, 'transfer failed');
+       }
+   }
+
+timed_crowdsale.sol
+~~~~~~~~~~~~~~~~~~~
+
+::
+
+   pragma solidity ^0.5.0;
+
+   contract TimedCrowdsale {
+
+     event Finished();
+     event notFinished();
+
+     // Sale should finish exactly at January 1, 2019
+     function isSaleFinished() private returns (bool) {
+       return block.timestamp >= 1546300800;
+     }
+
+     function run() public {
+       if (isSaleFinished()) {
+           emit Finished();
+       } else {
+           emit notFinished();
+       }
+     }
+
+   }

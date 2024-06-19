@@ -1,0 +1,112 @@
+SWC-130
+========
+
+标题
+----
+
+SWC-130 使用反向控制字符（Right-To-Left-Override control character
+(U+202E)）
+
+漏洞等级
+--------
+
+低
+
+描述
+----
+
+恶意行为者可以使用Right-To-Left-Override
+unicode字符来强制RTL文本呈现，并使用户混淆合约的真正意图。
+
+CWE漏洞分类
+-----------
+
+`CWE-451：关键信息的用户界面错误表示 <http://cwe.mitre.org/data/definitions/451.html>`__
+
+修改建议
+--------
+
+U+202E字符很少有合法用途。它不应出现在智能合约的源代码中。
+
+参考链接
+--------
+
+-  `超越智能合约 <https://youtu.be/P_Mtd5Fc_3E?t=1813>`__
+
+案例
+----
+
+guess_the_number.sol
+~~~~~~~~~~~~~~~~~~~~
+
+::
+
+   /*
+    * @source: https://youtu.be/P_Mtd5Fc_3E
+    * @author: Shahar Zini
+    */
+   pragma solidity ^0.5.0;
+
+   contract GuessTheNumber
+   {
+       uint _secretNumber;
+       address payable _owner;
+       event success(string);
+       event wrongNumber(string);
+
+       constructor(uint secretNumber) payable public
+       {
+           require(secretNumber <= 10);
+           _secretNumber = secretNumber;
+           _owner = msg.sender;
+       }
+
+       function getValue() view public returns (uint)
+       {
+           return address(this).balance;
+       }
+
+       function guess(uint n) payable public
+       {
+           require(msg.value == 1 ether);
+
+           uint p = address(this).balance;
+           checkAndTransferPrize(/*The prize‮/*rebmun desseug*/n , p/*‭
+                   /*The user who should benefit */,msg.sender);
+       }
+
+       function checkAndTransferPrize(uint p, uint n, address payable guesser) internal returns(bool)
+       {
+           if(n == _secretNumber)
+           {
+               guesser.transfer(p);
+               emit success("You guessed the correct number!");
+           }
+           else
+           {
+               emit wrongNumber("You've made an incorrect guess!");
+           }
+       }
+
+       function kill() public
+       {
+           require(msg.sender == _owner);
+           selfdestruct(_owner);
+       }
+   }
+
+注释
+^^^^
+
+这行代码
+
+::
+
+   checkAndTransferPrize(/*The prize‮/*rebmun desseug*/n , p/*
+
+函数\ ``guess(uint n)``\ 内部使用了不可见的方向控制字符，因此屏幕上显示的是错误的参数顺序。调用该函数时，参数为\ ``n, p, address``\ ，这是字符的\ **逻辑顺序**\ 、但有些字符是从右向左显示的，因此
+“n, p”段在读者看来顺序是相反的,因为代码中包含了不可见的方向控制字符。
+
+逐个字符选择文本通常会显示这种情况 –
+选择会突然跳到从右到左文本的末尾，并开始从右侧向左延伸。也可以在内容中明确检查
+unicode 字符。

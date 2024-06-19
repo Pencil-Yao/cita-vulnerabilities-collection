@@ -1,0 +1,201 @@
+SWC-118
+========
+
+标题
+----
+
+SWC-118 错误的构造函数名（Incorrect Constructor Name）
+
+漏洞等级
+--------
+
+低
+
+描述
+----
+
+Constructors are special functions that are called only once during the
+contract creation. They often perform critical, privileged actions such
+as setting the owner of the contract. Before Solidity version 0.4.22,
+the only way of defining a constructor was to create a function with the
+same name as the contract class containing it. A function meant to
+become a constructor becomes a normal, callable function if its name
+doesn’t exactly match the contract name. This behavior sometimes leads
+to security issues, in particular when smart contract code is re-used
+with a different name but the name of the constructor function is not
+changed accordingly.
+
+构造函数是特殊函数，仅在合约创建期间调用一次。构造函数通常执行关键的特权操作，例如设置合约所有者。在Solidity
+0.4.22版之前，定义构造函数的唯一方法是创建一个与包含它的合约类同名的函数。如果要成为构造函数的函数名称与合约类名称不完全匹配，则该函数将成为常规的可调用函数。此行为有时会导致安全问题，尤其是当智能合约代码以其他名称重复使用但忘记更改构造函数名称时。
+
+CWE漏洞分类
+-----------
+
+`CWE-665：初始化不正确 <http://cwe.mitre.org/data/definitions/665.html>`__
+
+修改建议
+--------
+
+Solidity
+0.4.22版本引入了一个新\ ``constructor``\ 关键字，使构造函数定义更清晰。因此，建议将合约升级到Solidity编译器的最新版本，并更改​​为新的构造函数声明。
+
+参考链接
+--------
+
+-  `SigmaPrime -
+   小心构造函数 <https://blog.sigmaprime.io/solidity-security.html#constructors>`__
+
+案例
+----
+
+incorrect_constructor_name1.sol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+   /*
+    * @source: https://github.com/trailofbits/not-so-smart-contracts/blob/master/wrong_constructor_name/incorrect_constructor.sol
+    * @author: Ben Perez
+    * Modified by Gerhard Wagner
+    */
+
+
+   pragma solidity 0.4.24;
+
+   contract Missing{
+       address private owner;
+
+       modifier onlyowner {
+           require(msg.sender==owner);
+           _;
+       }
+       
+       function missing()
+           public 
+       {
+           owner = msg.sender;
+       }
+
+       function () payable {} 
+
+       function withdraw() 
+           public 
+           onlyowner
+       {
+          owner.transfer(this.balance);
+       }
+   }
+
+incorrect_constructor_name1_fixed.sol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+   /*
+    * @source: https://github.com/trailofbits/not-so-smart-contracts/blob/master/wrong_constructor_name/incorrect_constructor.sol
+    * @author: Ben Perez
+    * Modified by Gerhard Wagner
+    */
+
+
+   pragma solidity ^0.4.24;
+
+   contract Missing{
+       address private owner;
+
+       modifier onlyowner {
+           require(msg.sender==owner);
+           _;
+       }
+
+       constructor()
+           public
+       {
+           owner = msg.sender;
+       }
+
+       function () payable {}
+
+       function withdraw()
+           public
+           onlyowner
+       {
+          owner.transfer(this.balance);
+       }
+   }
+
+incorrect_constructor_name2.sol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+   /*
+    * @source: https://github.com/trailofbits/not-so-smart-contracts/blob/master/wrong_constructor_name/incorrect_constructor.sol
+    * @author: Ben Perez
+    * Modified by Gerhard Wagner
+    */
+
+   pragma solidity 0.4.24;
+
+   contract Missing{
+       address private owner;
+
+       modifier onlyowner {
+           require(msg.sender==owner);
+           _;
+       }
+
+       function Constructor()
+           public 
+       {
+           owner = msg.sender;
+       }
+
+       function () payable {} 
+
+       function withdraw() 
+           public 
+           onlyowner
+       {
+          owner.transfer(this.balance);
+       }
+
+   }
+
+incorrect_constructor_name2_fixed.sol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+   /*
+    * @source: https://github.com/trailofbits/not-so-smart-contracts/blob/master/wrong_constructor_name/incorrect_constructor.sol
+    * @author: Ben Perez
+    * Modified by Gerhard Wagner
+    */
+
+   pragma solidity ^0.4.24;
+
+   contract Missing{
+       address private owner;
+
+       modifier onlyowner {
+           require(msg.sender==owner);
+           _;
+       }
+
+       constructor()
+           public
+       {
+           owner = msg.sender;
+       }
+
+       function () payable {}
+
+       function withdraw()
+           public
+           onlyowner
+       {
+          owner.transfer(this.balance);
+       }
+
+   }

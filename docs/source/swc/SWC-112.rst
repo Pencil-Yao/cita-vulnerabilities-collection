@@ -1,0 +1,135 @@
+SWC-112
+========
+
+标题
+----
+
+SWC-112 委托调用非可信合约（Delegatecall to Untrusted Callee）
+
+漏洞等级
+--------
+
+中
+
+描述
+----
+
+There exists a special variant of a message call, named ``delegatecall``
+which is identical to a message call apart from the fact that the code
+at the target address is executed in the context of the calling contract
+and ``msg.sender`` and ``msg.value`` do not change their values. This
+allows a smart contract to dynamically load code from a different
+address at runtime. Storage, current address and balance still refer to
+the calling contract.
+
+Calling into untrusted contracts is very dangerous, as the code at the
+target address can change any storage values of the caller and has full
+control over the caller’s balance.
+
+``delegatecall``\ 是一个消息调用的特殊变体，它类似于消息调用，不同之处在于目标地址上的代码是在调用合约的上下文中执行的，\ ``msg.sender``\ 和\ ``msg.value``\ 保持不变。这允许智能合约在运行时从其他地址动态加载代码。存储空间、当前地址和余额仍参考调用合约。
+
+调用不受信任的合约非常危险，因为目标地址上的代码可以更改调用者的任何存储值，并且可以完全控制调用者的余额。
+
+CWE漏洞分类
+-----------
+
+`CWE-829：包含不受信任域的功能 <https://cwe.mitre.org/data/definitions/829.html>`__
+
+修改建议
+--------
+
+请谨慎使用\ ``delegatecall``\ ，并确保切勿调用不受信任的合约。如果目标地址来自用户输入，请确保使用受信任合约白名单进行检查。
+
+参考链接
+--------
+
+-  `Solidity文档-delegatecall/callcode和库 <https://solidity.readthedocs.io/en/latest/introduction-to-smart-contracts.html#delegatecall-callcode-and-libraries>`__
+-  `如何确保智能合约的安全：6个实体漏洞以及如何避免它们（第1部分）-
+   Delegate
+   Call <https://medium.com/loom-network/how-to-secure-your-smart-contracts-6-solidity-vulnerabilities-and-how-to-avoid-them-part-1-c33048d4d17d>`__
+-  `Solidity Security：已知攻击媒介和常见反模式的完整列表-Delegatecall -
+   Delegatecall <https://blog.sigmaprime.io/solidity-security.html#delegatecall>`__
+
+案例
+----
+
+proxy.sol
+~~~~~~~~~
+
+::
+
+   pragma solidity ^0.4.24;
+
+   contract Proxy {
+
+     address owner;
+
+     constructor() public {
+       owner = msg.sender;  
+     }
+
+     function forward(address callee, bytes _data) public {
+       require(callee.delegatecall(_data));
+     }
+
+   }
+
+proxy_fixed.sol
+~~~~~~~~~~~~~~~
+
+::
+
+   pragma solidity ^0.4.24;
+
+   contract Proxy {
+
+     address callee;
+     address owner;
+
+     modifier onlyOwner {
+       require(msg.sender == owner);
+       _;
+     }
+
+     constructor() public {
+       callee = address(0x0);
+       owner = msg.sender;
+     }
+
+     function setCallee(address newCallee) public onlyOwner {
+       callee = newCallee;
+     }
+
+     function forward(bytes _data) public {
+       require(callee.delegatecall(_data));
+     }
+
+   }
+
+proxy_pattern_false_positive.sol
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+   pragma solidity ^0.4.24;
+
+   contract proxy{
+     address owner;
+
+     function proxyCall(address _to, bytes _data) external {
+       require( !_to.delegatecall(_data));
+     }
+     function withdraw() external{
+       require(msg.sender == owner);
+       msg.sender.transfer(address(this).balance);
+     }
+   } 
+
+   /*
+   You can't use proxyCall to change the owner address as either: 
+
+   1) the delegatecall reverts and thus does not change owner
+   2) the delegatecall does not revert and therefore will cause the proxyCall to revert and preventing owner from changing
+
+   This false positive may seem like a really edge case, however since you can revert data back to proxy this patern is useful for proxy architectures
+   */
