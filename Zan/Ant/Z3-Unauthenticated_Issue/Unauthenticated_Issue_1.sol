@@ -96,19 +96,3 @@ contract Test1 {
 interface IGovernance {
     function hasRole(bytes32 role, address account) external view returns (bool);
 }
-
-contract Test2 {
-    error OnlyManager();
-
-    IGovernance public gov;
-    bytes32 private constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
-
-    modifier onlyManager() {
-        if (!gov.hasRole(MANAGER_ROLE, msg.sender)) revert OnlyManager();
-        _;
-    }
-
-    function good(IGovernance _newGov) external onlyManager {
-        gov = _newGov;
-    }
-}
